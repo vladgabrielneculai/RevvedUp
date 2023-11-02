@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "590281331792",
+    "project_id": "revvedup-f1c15",
+    "storage_bucket": "revvedup-f1c15.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:590281331792:android:74dfa6a75a794e3ba26d55",
+        "android_client_info": {
+          "package_name": "com.vgn.revvedup"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAHovxpRWjZWaU4980xpchh_NmY9_pnN9s"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

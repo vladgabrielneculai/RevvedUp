@@ -1,0 +1,18 @@
+<resources>
+    <string name="app_name">RevvedUp</string>
+    <string name="already_an_user_login">Deja un utilizator? Autentifică-te</string>
+    <string name="register_btn">Înregistrare</string>
+    <string name="confirm_password">Confirmare Parolă</string>
+    <string name="password">Parolă</string>
+    <string name="email">Adresa de Email</string>
+    <string name="last_name">Nume</string>
+    <string name="first_name">Prenume</string>
+    <string name="register">Înregistrare</string>
+    <string name="logo">RevvedUp</string>
+    <string name="login">Autentificare</string>
+    <string name="register_now">Nu ai cont? Înregistrează-te acum!</string>
+    <string name="login_btn">Autentificare</string>
+    <string name="home_page">PAGINA PRINCIPALĂ</string>
+    <string name="username">Nume de utilizator</string>
+    <string name="search">Cautare</string>
+</resources>
