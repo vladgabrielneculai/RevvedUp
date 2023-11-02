@@ -6,18 +6,18 @@
         android:icon="@drawable/baseline_home_24"/>
     <item
         android:id="@+id/event"
-        android:title="Evenimente"
+        android:title="Evenimente și Utilizatori"
         android:icon="@drawable/baseline_event_24"/>
     <item
         android:id="@+id/fab"
         android:title=""
         android:enabled="false"/>
     <item
-        android:id="@+id/users"
-        android:title="Utilizatori"
-        android:icon="@drawable/baseline_account_circle_24"/>
+        android:id="@+id/settings"
+        android:title="Setări"
+        android:icon="@drawable/baseline_settings_24"/>
     <item
-        android:id="@+id/logout"
-        android:title="Deconectare"
-        android:icon="@drawable/baseline_logout_24"/>
+        android:id="@+id/account"
+        android:title="Profil"
+        android:icon="@drawable/baseline_account_circle_24"/>
 </menu>

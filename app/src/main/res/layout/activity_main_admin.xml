@@ -35,10 +35,16 @@
         android:id="@+id/floatingActionButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:backgroundTint="@color/midnight_blue"
-        android:contentDescription="@string/search"
-        android:src="@drawable/baseline_search_24"
+        android:backgroundTint="@color/golden_yellow"
+        android:contentDescription="@string/add"
+        android:src="@drawable/baseline_add_24"
         app:layout_anchor="@id/bottomAppBar"
         app:maxImageSize="40dp"
-        app:tint="@color/golden_yellow" />
+        app:tint="@color/midnight_blue"/>
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="835dp">
+
+    </ScrollView>
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
