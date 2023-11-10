@@ -4,17 +4,10 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/white"
+    android:background="@color/yellow"
     android:gravity="center"
     android:orientation="vertical"
     tools:context=".RegisterActivity">
-
-    <androidx.cardview.widget.CardView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_margin="30dp"
-        app:cardCornerRadius="30dp"
-        app:cardElevation="20dp">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -45,7 +38,7 @@
                 android:id="@+id/lname"
                 android:layout_width="match_parent"
                 android:layout_height="50dp"
-                android:layout_marginTop="15sp"
+                android:layout_marginTop="10sp"
                 android:autofillHints=""
                 android:background="@drawable/midnight_blue_border"
                 android:hint="@string/last_name"
@@ -59,7 +52,7 @@
                 android:id="@+id/fname"
                 android:layout_width="match_parent"
                 android:layout_height="50dp"
-                android:layout_marginTop="15sp"
+                android:layout_marginTop="10sp"
                 android:autofillHints=""
                 android:background="@drawable/midnight_blue_border"
                 android:hint="@string/first_name"
@@ -73,7 +66,7 @@
                 android:id="@+id/username"
                 android:layout_width="match_parent"
                 android:layout_height="50dp"
-                android:layout_marginTop="15sp"
+                android:layout_marginTop="10sp"
                 android:autofillHints=""
                 android:background="@drawable/midnight_blue_border"
                 android:hint="@string/username"
@@ -87,7 +80,7 @@
                 android:id="@+id/email"
                 android:layout_width="match_parent"
                 android:layout_height="50dp"
-                android:layout_marginTop="15sp"
+                android:layout_marginTop="10sp"
                 android:autofillHints=""
                 android:background="@drawable/midnight_blue_border"
                 android:hint="@string/email"
@@ -101,7 +94,7 @@
                 android:id="@+id/password"
                 android:layout_width="match_parent"
                 android:layout_height="50dp"
-                android:layout_marginTop="15dp"
+                android:layout_marginTop="10sp"
                 android:autofillHints=""
                 android:background="@drawable/midnight_blue_border"
                 android:hint="@string/password"
@@ -115,7 +108,7 @@
                 android:id="@+id/cpassword"
                 android:layout_width="match_parent"
                 android:layout_height="50dp"
-                android:layout_marginTop="15dp"
+                android:layout_marginTop="10sp"
                 android:autofillHints=""
                 android:background="@drawable/midnight_blue_border"
                 android:hint="@string/confirm_password"
@@ -125,11 +118,44 @@
                 android:textColor="@color/midnight_blue"
                 android:textSize="15sp" />
 
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/choose_role"
+                android:textAlignment="center"
+                android:textColor="@color/midnight_blue"
+                android:textSize="20sp"
+                android:layout_marginTop="10sp"
+                android:layout_marginBottom="5dp"
+                android:textStyle="bold" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:background="@color/yellow"
+                android:orientation="horizontal">
+
+                <CheckBox
+                    android:id="@+id/user"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Utilizator" />
+
+                <CheckBox
+                    android:id="@+id/event_admin"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Organizator Eveniment"
+                    android:layout_marginStart="16dp" />
+
+            </LinearLayout>
+
+
             <Button
                 android:id="@+id/register_button"
                 android:layout_width="match_parent"
                 android:layout_height="60dp"
-                android:layout_margin="10dp"
                 android:text="@string/register_btn"
                 android:textSize="18sp"
                 android:backgroundTint="@color/midnight_blue"
@@ -147,6 +173,5 @@
                 android:textSize="16sp" />
 
         </LinearLayout>
-    </androidx.cardview.widget.CardView>
 
 </LinearLayout>

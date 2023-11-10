@@ -2,14 +2,15 @@ package com.vgn.revvedup;
 
 public class HelperClass {
 
-    String fname, lname, email, username, password;
+    String fname, lname, email, username, password, role;
 
-    public HelperClass(String fname, String lname, String username, String email, String password) {
+    public HelperClass(String fname, String lname, String username, String email, String password, String role) {
         this.fname = fname;
         this.lname = lname;
         this.email = email;
         this.username = username;
         this.password = password;
+        this.role = role;
     }
 
     public HelperClass() {
@@ -53,5 +54,13 @@ public class HelperClass {
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    public String getRole() {
+        return role;
+    }
+
+    public void setRole(String role) {
+        this.role = role;
     }
 }

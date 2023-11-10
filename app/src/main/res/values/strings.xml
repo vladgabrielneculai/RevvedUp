@@ -16,4 +16,7 @@
     <string name="username">Nume de utilizator</string>
     <string name="search">Cautare</string>
     <string name="add">Adăugare</string>
+    <string name="choose_role">Alege tipul de utilizator</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>

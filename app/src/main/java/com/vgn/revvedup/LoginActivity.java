@@ -23,7 +23,6 @@ public class LoginActivity extends AppCompatActivity {
     Button loginButton;
     TextView signupRedirectText;
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -37,9 +36,9 @@ public class LoginActivity extends AppCompatActivity {
         loginButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(!validateUsername() | !validatePassword()){
+                if (!validateUsername() | !validatePassword()) {
 
-                }else{
+                } else {
                     checkUser();
                 }
             }
@@ -54,29 +53,29 @@ public class LoginActivity extends AppCompatActivity {
         });
     }
 
-    public Boolean validateUsername(){
+    public Boolean validateUsername() {
         String val = loginUsername.getText().toString();
-        if (val.isEmpty()){
+        if (val.isEmpty()) {
             loginUsername.setError("Numele de utilizator nu poate fi liber");
             return false;
-        }else{
+        } else {
             loginUsername.setError(null);
             return true;
         }
     }
 
-    public Boolean validatePassword(){
+    public Boolean validatePassword() {
         String val = loginPassword.getText().toString();
-        if (val.isEmpty()){
-            loginPassword.setError("Parola nu poate fi libera");
+        if (val.isEmpty()) {
+            loginPassword.setError("Parola nu poate fi liberă");
             return false;
-        }else{
+        } else {
             loginPassword.setError(null);
             return true;
         }
     }
 
-    public void checkUser(){
+    public void checkUser() {
         String userUsername = loginUsername.getText().toString().trim();
         String userPassword = loginPassword.getText().toString().trim();
 
@@ -86,20 +85,20 @@ public class LoginActivity extends AppCompatActivity {
         checkUserDatabase.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                if (snapshot.exists()){
+                if (snapshot.exists()) {
                     loginUsername.setError(null);
                     String passwordFromDB = snapshot.child(userUsername).child("password").getValue(String.class);
+                    String roleFromDB = snapshot.child(userUsername).child("role").getValue(String.class);
 
-                    if (passwordFromDB.equals(userPassword)){
+                    if (passwordFromDB.equals(userPassword)) {
                         loginUsername.setError(null);
-                        Intent intent = new Intent(LoginActivity.this, MainActivityAdmin.class);
-                        startActivity(intent);
-                    }else{
+                        startAppropriateActivity(roleFromDB);
+                    } else {
                         loginPassword.setError("Datele de autentificare sunt incorecte!");
                         loginPassword.requestFocus();
                     }
-                }else{
-                    loginUsername.setError("Utilizatorul nu exista!");
+                } else {
+                    loginUsername.setError("Utilizatorul nu există!");
                     loginUsername.requestFocus();
                 }
             }
@@ -109,5 +108,25 @@ public class LoginActivity extends AppCompatActivity {
 
             }
         });
+    }
+
+    private void startAppropriateActivity(String role) {
+        Intent intent;
+        switch (role) {
+            case "Admin":
+                intent = new Intent(LoginActivity.this, MainActivityAdmin.class);
+                startActivity(intent);
+                break;
+            case "User":
+                intent = new Intent(LoginActivity.this, MainActivityUser.class);
+                startActivity(intent);
+                break;
+            case "EventAdmin":
+                intent = new Intent(LoginActivity.this, MainActivityEventAdmin.class);
+                startActivity(intent);
+                break;
+            default:
+                break;
+        }
     }
 }
