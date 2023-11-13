@@ -13,8 +13,8 @@
         android:title=""
         android:enabled="false"/>
     <item
-        android:id="@+id/car_approval"
-        android:title="Listă mașini"
+        android:id="@+id/my_car"
+        android:title="Mașina mea"
         android:icon="@drawable/baseline_car_24"/>
     <item
         android:id="@+id/account"
