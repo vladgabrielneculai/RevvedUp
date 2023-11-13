@@ -19,4 +19,8 @@
     <string name="choose_role">Alege tipul de utilizator</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="home">Acasă</string>
+    <string name="events">Evenimente</string>
+    <string name="users">Utilizatori</string>
+    <string name="settings">Setări</string>
 </resources>
