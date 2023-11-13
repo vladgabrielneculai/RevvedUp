@@ -17,7 +17,7 @@
         android:title="Utilizatori"
         android:icon="@drawable/baseline_account_circle_24"/>
     <item
-        android:id="@+id/settings"
-        android:title="Setări"
-        android:icon="@drawable/baseline_settings_24"/>
+        android:id="@+id/logout"
+        android:title="Deconectare"
+        android:icon="@drawable/baseline_logout_24"/>
 </menu>

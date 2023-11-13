@@ -16,6 +16,9 @@
             android:name=".MainActivityParticipant"
             android:exported="false" />
         <activity
+            android:name=".CustomiseProfile"
+            android:exported="false" />
+        <activity
             android:name=".LoadingScreenActivity"
             android:exported="true">
             <intent-filter>
