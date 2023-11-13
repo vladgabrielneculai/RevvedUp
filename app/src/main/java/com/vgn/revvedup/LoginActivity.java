@@ -117,12 +117,16 @@ public class LoginActivity extends AppCompatActivity {
                 intent = new Intent(LoginActivity.this, MainActivityAdmin.class);
                 startActivity(intent);
                 break;
-            case "User":
+            case "Vizitator":
                 intent = new Intent(LoginActivity.this, MainActivityUser.class);
                 startActivity(intent);
                 break;
-            case "EventAdmin":
+            case "Organizator":
                 intent = new Intent(LoginActivity.this, MainActivityEventAdmin.class);
+                startActivity(intent);
+                break;
+            case "Participant":
+                intent = new Intent(LoginActivity.this, MainActivityParticipant.class);
                 startActivity(intent);
                 break;
             default:

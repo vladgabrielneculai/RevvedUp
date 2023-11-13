@@ -5,6 +5,8 @@ import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.View;
+import android.widget.ArrayAdapter;
+import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
@@ -25,7 +27,10 @@ public class RegisterActivity extends AppCompatActivity {
     EditText signupFName, signupLName, signupEmail, signupUsername, signupPassword, signupCPassword;
     TextView loginRedirectText;
     Button signupButton;
-    CheckBox signupRoleUser, signupRoleEventAdmin;
+
+    String[] item = {"Participant", "Organizator", "Vizitator"};
+    AutoCompleteTextView autoCompleteTextView;
+ArrayAdapter<String> adapterUserType;
     FirebaseDatabase database;
     DatabaseReference reference;
 
@@ -42,11 +47,14 @@ public class RegisterActivity extends AppCompatActivity {
         signupCPassword = findViewById(R.id.cpassword);
         signupButton = findViewById(R.id.register_button);
         loginRedirectText = findViewById(R.id.loginRedirectText);
-        signupRoleUser = findViewById(R.id.user);
-        signupRoleEventAdmin = findViewById(R.id.event_admin);
+        autoCompleteTextView = findViewById(R.id.autoComplete_usertype);
 
         database = FirebaseDatabase.getInstance();
         reference = database.getReference("utilizatori");
+
+        adapterUserType = new ArrayAdapter<String>(this, R.layout.user_type, item);
+
+        autoCompleteTextView.setAdapter(adapterUserType);
 
         signupUsername.addTextChangedListener(new TextWatcher() {
             @Override
@@ -86,7 +94,7 @@ public class RegisterActivity extends AppCompatActivity {
                 final String username = signupUsername.getText().toString();
                 final String email = signupEmail.getText().toString();
                 final String password = signupPassword.getText().toString();
-                final String role = (signupRoleUser.isChecked()) ? "User" : ((signupRoleEventAdmin.isChecked()) ? "EventAdmin" : "");
+                final String role = autoCompleteTextView.getText().toString();
 
                 if (signupUsername.getError() == null && signupEmail.getError() == null) {
                     reference.child(username).addListenerForSingleValueEvent(new ValueEventListener() {
