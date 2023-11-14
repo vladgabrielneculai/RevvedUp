@@ -17,7 +17,7 @@
         android:title="Favorite"
         android:icon="@drawable/baseline_favorite_24"/>
     <item
-        android:id="@+id/settings"
-        android:title="Setări"
-        android:icon="@drawable/baseline_settings_24"/>
+        android:id="@+id/More"
+        android:title="Mai multe"
+        android:icon="@drawable/baseline_more_24"/>
 </menu>
