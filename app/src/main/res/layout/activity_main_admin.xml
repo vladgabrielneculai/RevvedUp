@@ -7,10 +7,11 @@
     android:layout_height="match_parent"
     android:background="@color/white"
     tools:context=".MainActivityAdmin">
+
     <FrameLayout
+        android:id="@+id/frame_layout"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:id="@+id/frame_layout"/>
+        android:layout_height="match_parent" />
 
     <com.google.android.material.bottomappbar.BottomAppBar
         android:id="@+id/bottomAppBar"
@@ -28,6 +29,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:background="@color/midnight_blue"
+            app:itemIconTint="@color/white"
             app:labelVisibilityMode="selected"
             app:menu="@menu/bottom_menu_admin" />
     </com.google.android.material.bottomappbar.BottomAppBar>

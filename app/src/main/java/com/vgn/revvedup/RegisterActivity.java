@@ -16,6 +16,12 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.Firebase;
+import com.google.firebase.auth.AuthResult;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -30,9 +36,10 @@ public class RegisterActivity extends AppCompatActivity {
 
     String[] item = {"Participant", "Organizator", "Vizitator"};
     AutoCompleteTextView autoCompleteTextView;
-ArrayAdapter<String> adapterUserType;
+    ArrayAdapter<String> adapterUserType;
     FirebaseDatabase database;
     DatabaseReference reference;
+    FirebaseAuth mAuth;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,11 +56,11 @@ ArrayAdapter<String> adapterUserType;
         loginRedirectText = findViewById(R.id.loginRedirectText);
         autoCompleteTextView = findViewById(R.id.autoComplete_usertype);
 
+        mAuth = FirebaseAuth.getInstance();
         database = FirebaseDatabase.getInstance();
         reference = database.getReference("utilizatori");
 
         adapterUserType = new ArrayAdapter<String>(this, R.layout.user_type, item);
-
         autoCompleteTextView.setAdapter(adapterUserType);
 
         signupUsername.addTextChangedListener(new TextWatcher() {
@@ -86,61 +93,81 @@ ArrayAdapter<String> adapterUserType;
             }
         });
 
-        signupButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                final String fname = signupFName.getText().toString();
-                final String lname = signupLName.getText().toString();
-                final String username = signupUsername.getText().toString();
-                final String email = signupEmail.getText().toString();
-                final String password = signupPassword.getText().toString();
-                final String role = autoCompleteTextView.getText().toString();
+        signupButton.setOnClickListener(v -> {
 
-                if (signupUsername.getError() == null && signupEmail.getError() == null) {
-                    reference.child(username).addListenerForSingleValueEvent(new ValueEventListener() {
-                        @Override
-                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                            if (dataSnapshot.exists()) {
-                                Toast.makeText(RegisterActivity.this, "Acest nume de utilizator este deja existent!", Toast.LENGTH_SHORT).show();
-                            } else {
-                                reference.orderByChild("email").equalTo(email).addListenerForSingleValueEvent(new ValueEventListener() {
-                                    @Override
-                                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                                        if (dataSnapshot.exists()) {
-                                            Toast.makeText(RegisterActivity.this, "Există deja un cont asociat acestei adrese de email! Reîncercați!", Toast.LENGTH_SHORT).show();
-                                        } else {
-                                            if (isPasswordValid(password)) {
-                                                HelperClass helperClass = new HelperClass(fname, lname, username, email, password, role);
-                                                reference.child(username).setValue(helperClass);
+            String fname = signupFName.getText().toString();
+            String lname = signupLName.getText().toString();
+            String username = signupUsername.getText().toString();
+            String email = signupEmail.getText().toString();
+            String password = signupPassword.getText().toString();
+            String role = autoCompleteTextView.getText().toString();
 
-                                                Toast.makeText(RegisterActivity.this, "V-ați autentificat cu succes!", Toast.LENGTH_SHORT).show();
-                                                Intent intent = new Intent(RegisterActivity.this, MainActivityUser.class);
-                                                startActivity(intent);
-                                            } else {
-                                                Toast.makeText(RegisterActivity.this, "Parola trebuie să aibă minim 8 caractere și să conțină o majusculă, o cifră și un caracter special.", Toast.LENGTH_LONG).show();
-                                                signupPassword.setText("");
-                                                signupCPassword.setText("");
-                                            }
-                                        }
-                                    }
-
-                                    @Override
-                                    public void onCancelled(@NonNull DatabaseError databaseError) {
-                                        // Handle error
-                                    }
-                                });
-                            }
+            mAuth.createUserWithEmailAndPassword(email, password).addOnCompleteListener(this, task -> {
+                if (task.isSuccessful()) {
+                    if (isPasswordValid(password)) {
+                        FirebaseUser user = mAuth.getCurrentUser();
+                        if (user != null) {
+                            String uid = user.getUid();
+                            User newUser = new User(fname, lname, username, email, password, role, uid);
+                            reference.child(username).setValue(newUser);
+                            Toast.makeText(RegisterActivity.this, "V-ați autentificat cu succes!", Toast.LENGTH_SHORT).show();
+                            Intent intent = new Intent(this, LoginActivity.class);
+                            startActivity(intent);
                         }
-
-                        @Override
-                        public void onCancelled(@NonNull DatabaseError databaseError) {
-                            // Handle error
-                        }
-                    });
+                    } else {
+                        Toast.makeText(RegisterActivity.this, "Parola trebuie să aibă minim 6 caractere și să conțină o majusculă, o cifră și un caracter special.", Toast.LENGTH_LONG).show();
+                        signupPassword.setText("");
+                        signupCPassword.setText("");
+                    }
                 } else {
-                    Toast.makeText(RegisterActivity.this, "Verificați username-ul și adresa de email!", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(RegisterActivity.this, "S-a produs o eroare! Reîncercați!", Toast.LENGTH_SHORT).show();
                 }
-            }
+            });
+
+//            if (signupUsername.getError() == null && signupEmail.getError() == null) {
+//                reference.child(username).addListenerForSingleValueEvent(new ValueEventListener() {
+//                    @Override
+//                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+//                        if (dataSnapshot.exists()) {
+//                            Toast.makeText(RegisterActivity.this, "Acest nume de utilizator este deja existent!", Toast.LENGTH_SHORT).show();
+//                        } else {
+//                            reference.orderByChild("email").equalTo(email).addListenerForSingleValueEvent(new ValueEventListener() {
+//                                @Override
+//                                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+//                                    if (dataSnapshot.exists()) {
+//                                        Toast.makeText(RegisterActivity.this, "Există deja un cont asociat acestei adrese de email! Reîncercați!", Toast.LENGTH_SHORT).show();
+//                                    } else {
+//                                        if (isPasswordValid(password)) {
+//                                            HelperClass helperClass = new HelperClass(fname, lname, username, email, password, role);
+//                                            reference.child(username).setValue(helperClass);
+//
+//                                            Toast.makeText(RegisterActivity.this, "V-ați autentificat cu succes!", Toast.LENGTH_SHORT).show();
+//                                            Intent intent = new Intent(RegisterActivity.this, MainActivityUser.class);
+//                                            startActivity(intent);
+//                                        } else {
+//                                            Toast.makeText(RegisterActivity.this, "Parola trebuie să aibă minim 8 caractere și să conțină o majusculă, o cifră și un caracter special.", Toast.LENGTH_LONG).show();
+//                                            signupPassword.setText("");
+//                                            signupCPassword.setText("");
+//                                        }
+//                                    }
+//                                }
+//
+//                                @Override
+//                                public void onCancelled(@NonNull DatabaseError databaseError) {
+//                                    // Handle error
+//                                }
+//                            });
+//                        }
+//                    }
+//
+//                    @Override
+//                    public void onCancelled(@NonNull DatabaseError databaseError) {
+//                        // Handle error
+//                    }
+//                });
+//            } else {
+//                Toast.makeText(RegisterActivity.this, "Verificați username-ul și adresa de email!", Toast.LENGTH_SHORT).show();
+//            }
         });
 
         loginRedirectText.setOnClickListener(new View.OnClickListener() {

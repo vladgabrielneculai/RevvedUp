@@ -9,7 +9,9 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:gravity="center"
+        android:padding="24dp">
 
         <androidx.cardview.widget.CardView
             android:layout_width="150dp"
@@ -34,7 +36,7 @@
             android:layout_gravity="center"
             android:layout_marginTop="10dp"
             android:gravity="center"
-            android:text="Salut,"
+            android:text="@string/salut"
             android:textSize="18sp" />
 
         <TextView
@@ -51,62 +53,26 @@
             android:id="@+id/modifyProfile"
             android:layout_width="match_parent"
             android:layout_height="60dp"
+            android:layout_marginLeft="15dp"
             android:layout_marginTop="20dp"
+            android:layout_marginRight="15dp"
             android:layout_marginBottom="5dp"
-            android:layout_marginLeft="15dp"
-            android:layout_marginRight="15dp"
-            android:text="Modifică Profilul"
-            android:textSize="18sp"
             android:backgroundTint="@color/golden_yellow"
-            app:cornerRadius = "30dp"/>
-
-        <Button
-            android:id="@+id/button1"
-            android:layout_width="match_parent"
-            android:layout_height="60dp"
-            android:layout_marginBottom="10dp"
-            android:layout_marginLeft="15dp"
-            android:layout_marginRight="15dp"
-            android:text="Buton1"
+            android:text="@string/modify_profile"
             android:textSize="18sp"
-            android:backgroundTint="@color/golden_yellow"
-            app:cornerRadius = "30dp"/>
-
-        <Button
-            android:id="@+id/button2"
-            android:layout_width="match_parent"
-            android:layout_height="60dp"
-            android:layout_marginBottom="10dp"
-            android:layout_marginLeft="15dp"
-            android:layout_marginRight="15dp"
-            android:text="Buton2"
-            android:textSize="18sp"
-            android:backgroundTint="@color/golden_yellow"
-            app:cornerRadius = "30dp"/>
-
-        <Button
-            android:id="@+id/button3"
-            android:layout_width="match_parent"
-            android:layout_height="60dp"
-            android:layout_marginBottom="10dp"
-            android:layout_marginLeft="15dp"
-            android:layout_marginRight="15dp"
-            android:text="Buton3"
-            android:textSize="18sp"
-            android:backgroundTint="@color/golden_yellow"
-            app:cornerRadius = "30dp"/>
+            app:cornerRadius="30dp" />
 
         <Button
             android:id="@+id/disconnect"
             android:layout_width="match_parent"
             android:layout_height="60dp"
-            android:layout_marginBottom="10dp"
             android:layout_marginLeft="15dp"
             android:layout_marginRight="15dp"
-            android:text="Deconectare"
-            android:textSize="18sp"
+            android:layout_marginBottom="10dp"
             android:backgroundTint="@color/golden_yellow"
-            app:cornerRadius = "30dp"/>
+            android:text="@string/logout"
+            android:textSize="18sp"
+            app:cornerRadius="30dp" />
 
     </LinearLayout>
 

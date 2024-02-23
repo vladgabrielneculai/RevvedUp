@@ -25,8 +25,6 @@ public class MainActivityAdmin extends AppCompatActivity {
                 replaceFragment(new AdminHomeFragment());
             } else if (item.getItemId() == R.id.event) {
                 replaceFragment(new AdminEventFragment());
-            } else if (item.getItemId() == R.id.users) {
-                replaceFragment(new AdminUsersFragment());
             } else if (item.getItemId() == R.id.more) {
                 replaceFragment(new MoreFragment());
             }

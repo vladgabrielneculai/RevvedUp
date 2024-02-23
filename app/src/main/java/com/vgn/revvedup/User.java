@@ -1,19 +1,20 @@
 package com.vgn.revvedup;
 
-public class HelperClass {
+public class User {
 
-    String fname, lname, email, username, password, role;
+    String fname, lname, email, username, password, role, uid;
 
-    public HelperClass(String fname, String lname, String username, String email, String password, String role) {
+    public User(String fname, String lname, String username, String email, String password, String role, String uid) {
         this.fname = fname;
         this.lname = lname;
         this.email = email;
         this.username = username;
         this.password = password;
         this.role = role;
+        this.uid = uid;
     }
 
-    public HelperClass() {
+    public User() {
     }
 
     public String getFname() {
@@ -62,5 +63,13 @@ public class HelperClass {
 
     public void setRole(String role) {
         this.role = role;
+    }
+
+    public String getUid() {
+        return uid;
+    }
+
+    public void setUid(String uid) {
+        this.uid = uid;
     }
 }

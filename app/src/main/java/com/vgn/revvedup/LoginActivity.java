@@ -5,110 +5,121 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
 public class LoginActivity extends AppCompatActivity {
 
-    EditText loginUsername, loginPassword;
+    EditText loginEmail, loginPassword;
     Button loginButton;
     TextView signupRedirectText;
+    FirebaseAuth mAuth;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
-        loginUsername = findViewById(R.id.username);
+        loginEmail = findViewById(R.id.email);
         loginPassword = findViewById(R.id.password);
         loginButton = findViewById(R.id.login_button);
         signupRedirectText = findViewById(R.id.registerRedirectText);
+        mAuth = FirebaseAuth.getInstance();
 
-        loginButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (!validateUsername() | !validatePassword()) {
+        mAuth = FirebaseAuth.getInstance();
 
-                } else {
-                    checkUser();
-                }
-            }
+        loginButton.setOnClickListener(v -> {
+
+            String email = loginEmail.getText().toString().trim();
+            String password = loginPassword.getText().toString().trim();
+
+            mAuth.signInWithEmailAndPassword(email, password)
+                    .addOnCompleteListener(task -> {
+                        if (task.isSuccessful()) {
+                            FirebaseUser user = mAuth.getCurrentUser();
+                            Toast.makeText(LoginActivity.this, "Bine ati venit!", Toast.LENGTH_SHORT).show();
+                            fetchUserRole(email);
+                        } else {
+                            Toast.makeText(LoginActivity.this, "S-a produs o eroare! Reîncercați!", Toast.LENGTH_SHORT).show();
+                        }
+                    });
         });
 
-        signupRedirectText.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(LoginActivity.this, RegisterActivity.class);
-                startActivity(intent);
-            }
+        signupRedirectText.setOnClickListener(v -> {
+            Intent intent = new Intent(LoginActivity.this, RegisterActivity.class);
+            startActivity(intent);
         });
     }
 
-    public Boolean validateUsername() {
-        String val = loginUsername.getText().toString();
-        if (val.isEmpty()) {
-            loginUsername.setError("Numele de utilizator nu poate fi liber");
-            return false;
-        } else {
-            loginUsername.setError(null);
-            return true;
-        }
-    }
-
-    public Boolean validatePassword() {
-        String val = loginPassword.getText().toString();
-        if (val.isEmpty()) {
-            loginPassword.setError("Parola nu poate fi liberă");
-            return false;
-        } else {
-            loginPassword.setError(null);
-            return true;
-        }
-    }
-
-    public void checkUser() {
-        String userUsername = loginUsername.getText().toString().trim();
-        String userPassword = loginPassword.getText().toString().trim();
-
-        DatabaseReference reference = FirebaseDatabase.getInstance().getReference("utilizatori");
-        Query checkUserDatabase = reference.orderByChild("username").equalTo(userUsername);
-
-        checkUserDatabase.addListenerForSingleValueEvent(new ValueEventListener() {
+    private void fetchUserRole(String email) {
+        DatabaseReference usersRef = FirebaseDatabase.getInstance().getReference().child("utilizatori");
+        usersRef.orderByChild("email").equalTo(email).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                if (snapshot.exists()) {
-                    loginUsername.setError(null);
-                    String passwordFromDB = snapshot.child(userUsername).child("password").getValue(String.class);
-                    String roleFromDB = snapshot.child(userUsername).child("role").getValue(String.class);
-
-                    if (passwordFromDB.equals(userPassword)) {
-                        loginUsername.setError(null);
-                        startAppropriateActivity(roleFromDB);
-                    } else {
-                        loginPassword.setError("Datele de autentificare sunt incorecte!");
-                        loginPassword.requestFocus();
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                if (dataSnapshot.exists()) {
+                    for (DataSnapshot userSnapshot : dataSnapshot.getChildren()) {
+                        String role = userSnapshot.child("role").getValue(String.class);
+                        startAppropriateActivity(role);
+                        return;
                     }
                 } else {
-                    loginUsername.setError("Utilizatorul nu există!");
-                    loginUsername.requestFocus();
+                    Toast.makeText(LoginActivity.this, "Utilizatorul nu a fost găsit", Toast.LENGTH_SHORT).show();
                 }
             }
 
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
-
+                Toast.makeText(LoginActivity.this, "Eroare la accesarea bazei de date", Toast.LENGTH_SHORT).show();
             }
         });
     }
+
+
+//    private boolean validateEmail(String email) {
+//
+//        if (email.isEmpty()) {
+//            loginEmail.setError("Vă rugăm să introduceți adresa de email!");
+//            return false;
+//        }
+//
+//        if (!android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
+//            loginEmail.setError("Vă rugăm să introduceți o adresă validă de email!");
+//            return false;
+//        }
+//
+//        return true;
+//    }
+//
+//    private boolean validatePassword() {
+//        String password = loginPassword.getText().toString().trim();
+//
+//        if (password.isEmpty()) {
+//            loginPassword.setError("Vă rugăm să introduceți parola!");
+//            return false;
+//        }
+//
+//        if (password.length() < 6) {
+//            loginPassword.setError("Parola trebuie să aibă minim 6 caractere");
+//            return false;
+//        }
+//
+//        if (!password.matches("^(?=.*[A-Z])(?=.*\\d)(?=.*[!@#$%^&*_+=~])[A-Za-z\\d!@#$%^&*_+=~]{8,}$")) {
+//            loginPassword.setError("Parola trebuie să conțină minim o literă mică, o literă mare, o cifră și un caracter special");
+//            return false;
+//        }
+//
+//        return true;
+//    }
 
     private void startAppropriateActivity(String role) {
         Intent intent;
@@ -118,15 +129,15 @@ public class LoginActivity extends AppCompatActivity {
                 startActivity(intent);
                 break;
             case "Vizitator":
-                intent = new Intent(LoginActivity.this, MainActivityUser.class);
+                intent = new Intent(LoginActivity.this, MainActivityAdmin.class);
                 startActivity(intent);
                 break;
             case "Organizator":
-                intent = new Intent(LoginActivity.this, MainActivityEventAdmin.class);
+                intent = new Intent(LoginActivity.this, MainActivityAdmin.class);
                 startActivity(intent);
                 break;
             case "Participant":
-                intent = new Intent(LoginActivity.this, MainActivityParticipant.class);
+                intent = new Intent(LoginActivity.this, MainActivityAdmin.class);
                 startActivity(intent);
                 break;
             default:
