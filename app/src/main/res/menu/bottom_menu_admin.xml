@@ -9,15 +9,15 @@
         android:title="@string/events"
         android:icon="@drawable/baseline_event_24"/>
     <item
-        android:id="@+id/fab"
-        android:title=""
-        android:enabled="false"/>
+        android:id="@+id/cars"
+        android:title="@string/cars"
+        android:icon="@drawable/baseline_car_24"/>
     <item
         android:id="@+id/users"
         android:title="@string/users"
         android:icon="@drawable/baseline_account_circle_24"/>
     <item
         android:id="@+id/more"
-        android:title="Mai multe"
+        android:title="@string/more"
         android:icon="@drawable/baseline_more_24"/>
 </menu>

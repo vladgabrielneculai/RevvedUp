@@ -1,32 +1,46 @@
 package com.vgn.revvedup;
 
+import android.content.Intent;
+import android.os.Bundle;
+
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
-import android.os.Bundle;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.FirebaseDatabase;
+import com.vgn.revvedup.databinding.ActivityMainBinding;
 
-import com.vgn.revvedup.databinding.ActivityMainAdminBinding;
 
-public class MainActivityAdmin extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity {
 
-    ActivityMainAdminBinding binding;
+    ActivityMainBinding binding;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        binding = ActivityMainAdminBinding.inflate(getLayoutInflater());
+        binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
-        replaceFragment(new AdminHomeFragment());
+        FirebaseAuth mAuth = FirebaseAuth.getInstance();
+        FirebaseDatabase database = FirebaseDatabase.getInstance();
+
+        FirebaseUser user = mAuth.getCurrentUser();
+
+
+        replaceFragment(new HomeFragment());
         binding.bottomNavigationView.setOnItemSelectedListener(item -> {
             if (item.getItemId() == R.id.home) {
-                replaceFragment(new AdminHomeFragment());
+                replaceFragment(new HomeFragment());
             } else if (item.getItemId() == R.id.event) {
-                replaceFragment(new AdminEventFragment());
+                replaceFragment(new EventFragment());
             } else if (item.getItemId() == R.id.more) {
                 replaceFragment(new MoreFragment());
+            } else if (item.getItemId() == R.id.add) {
+                Intent intent = new Intent(this, AddEventActivity.class);
+                startActivity(intent);
             }
             return true;
         });

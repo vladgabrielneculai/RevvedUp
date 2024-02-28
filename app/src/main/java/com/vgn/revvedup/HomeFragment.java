@@ -1,11 +1,9 @@
 package com.vgn.revvedup;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -19,24 +17,17 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+public class HomeFragment extends Fragment {
 
-public class MoreFragment extends Fragment {
+    private TextView usernameTextView;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_more, container, false);
-
-        Button modifyProfile = view.findViewById(R.id.modifyProfile);
-
-        modifyProfile.setOnClickListener(v -> {
-            Intent intent = new Intent(getActivity(), ModifyProfile.class);
-            startActivity(intent);
-        });
+        View view = inflater.inflate(R.layout.fragment_home, container, false);
 
         FirebaseAuth mAuth = FirebaseAuth.getInstance();
-        TextView usernameTextView = view.findViewById(R.id.usernameTextView);
-        TextView roleTextView = view.findViewById(R.id.roleTextView);
+        usernameTextView = view.findViewById(R.id.username);
 
         FirebaseDatabase database = FirebaseDatabase.getInstance();
         FirebaseUser user = mAuth.getCurrentUser();
@@ -48,32 +39,19 @@ public class MoreFragment extends Fragment {
                     if (dataSnapshot.exists()) {
                         for (DataSnapshot userSnapshot : dataSnapshot.getChildren()) {
                             String fnameFromDb = userSnapshot.child("fname").getValue(String.class);
-                            String lnameFromDb = userSnapshot.child("lname").getValue(String.class);
-                            String roleFromDb = userSnapshot.child("role").getValue(String.class);
-                            usernameTextView.setText(String.format("%s %s", fnameFromDb, lnameFromDb));
-                            roleTextView.setText(String.format("%s",roleFromDb));
+                            usernameTextView.setText(String.format("Salut, %s!", fnameFromDb));
                         }
                     } else {
                         usernameTextView.setText(R.string.username);
-                        roleTextView.setText(R.string.role);
                     }
                 }
+
                 @Override
                 public void onCancelled(@NonNull DatabaseError error) {
                     usernameTextView.setText(R.string.error);
-                    roleTextView.setText(R.string.error);
                 }
             });
         }
-
-        Button logoutButton = view.findViewById(R.id.disconnect);
-
-        logoutButton.setOnClickListener(v -> {
-            FirebaseAuth.getInstance().signOut();
-            Intent intent = new Intent(getActivity(), LoginActivity.class);
-            startActivity(intent);
-            requireActivity().finish();
-        });
 
         return view;
     }

@@ -11,68 +11,68 @@
         android:layout_height="match_parent"
         android:orientation="vertical"
         android:gravity="center"
-        android:padding="24dp">
+        android:padding="24sp">
 
         <androidx.cardview.widget.CardView
-            android:layout_width="150dp"
-            android:layout_height="150dp"
+            android:layout_width="150sp"
+            android:layout_height="150sp"
             android:layout_gravity="center"
-            android:layout_marginTop="50dp"
-            app:cardCornerRadius="250dp">
+            android:layout_marginTop="50sp"
+            app:cardCornerRadius="250sp">
 
             <ImageView
                 android:id="@+id/profileImageView"
-                android:layout_width="150dp"
-                android:layout_height="150dp"
+                android:layout_width="150sp"
+                android:layout_height="150sp"
                 android:scaleType="centerCrop"
                 android:src="@drawable/profile_image" />
 
         </androidx.cardview.widget.CardView>
 
         <TextView
-            android:id="@+id/greetingTextView"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:layout_marginTop="10dp"
-            android:gravity="center"
-            android:text="@string/salut"
-            android:textSize="18sp" />
-
-        <TextView
             android:id="@+id/usernameTextView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:layout_marginTop="5dp"
+            android:layout_marginTop="5sp"
             android:gravity="center"
-            android:text="User Name"
+            android:text=""
             android:textSize="24sp" />
+
+        <TextView
+            android:id="@+id/roleTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginTop="5sp"
+            android:gravity="center"
+            android:text=""
+            android:textSize="18sp" />
 
         <Button
             android:id="@+id/modifyProfile"
             android:layout_width="match_parent"
-            android:layout_height="60dp"
-            android:layout_marginLeft="15dp"
-            android:layout_marginTop="20dp"
-            android:layout_marginRight="15dp"
-            android:layout_marginBottom="5dp"
+            android:layout_height="60sp"
+            android:layout_marginLeft="15sp"
+            android:layout_marginTop="20sp"
+            android:layout_marginRight="15sp"
+            android:layout_marginBottom="5sp"
             android:backgroundTint="@color/golden_yellow"
             android:text="@string/modify_profile"
             android:textSize="18sp"
-            app:cornerRadius="30dp" />
+            app:cornerRadius="30sp" />
 
         <Button
             android:id="@+id/disconnect"
             android:layout_width="match_parent"
-            android:layout_height="60dp"
-            android:layout_marginLeft="15dp"
-            android:layout_marginRight="15dp"
-            android:layout_marginBottom="10dp"
+            android:layout_height="60sp"
+            android:layout_marginLeft="15sp"
+            android:layout_marginRight="15sp"
+            android:layout_marginBottom="10sp"
             android:backgroundTint="@color/golden_yellow"
             android:text="@string/logout"
             android:textSize="18sp"
-            app:cornerRadius="30dp" />
+            app:cornerRadius="30sp" />
 
     </LinearLayout>
 

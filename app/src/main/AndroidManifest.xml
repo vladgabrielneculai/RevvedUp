@@ -15,7 +15,9 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.RevvedUp"
         tools:targetApi="s">
-
+        <activity
+            android:name=".AddEventActivity"
+            android:exported="false" />
         <activity
             android:name=".ModifyProfile"
             android:exported="false" />
@@ -35,9 +37,8 @@
             android:name=".RegisterActivity"
             android:exported="false" />
         <activity
-            android:name=".MainActivityAdmin"
+            android:name=".MainActivity"
             android:exported="false" />
-
     </application>
 
 </manifest>

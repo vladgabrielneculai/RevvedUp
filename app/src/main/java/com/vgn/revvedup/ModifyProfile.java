@@ -9,7 +9,6 @@ import android.widget.ImageView;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -44,8 +43,8 @@ public class ModifyProfile extends AppCompatActivity {
             startActivity(intent);
         });
 
-        String currentUserID = String.valueOf(FirebaseAuth.getInstance().getCurrentUser());
-        DatabaseReference userRef = FirebaseDatabase.getInstance().getReference("utilizatori").child(currentUserID);
+        //String currentUserID = String.valueOf(FirebaseAuth.getInstance().getCurrentUser());
+        DatabaseReference userRef = FirebaseDatabase.getInstance().getReference("utilizatori");
 
         userRef.addValueEventListener(new ValueEventListener() {
             @Override
