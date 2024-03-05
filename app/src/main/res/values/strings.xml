@@ -52,4 +52,7 @@
     <string name="cars">Mașini</string>
     <string name="car_list">Listă mașini</string>
     <string name="addv2">Adaugă</string>
+    <string name="modify">Modifică</string>
+    <string name="cars_existent">Masinile existente</string>
+    <string name="users_existent">Utilizatori existenti</string>
 </resources>

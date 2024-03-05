@@ -30,7 +30,7 @@
             android:background="@color/midnight_blue"
             app:itemIconTint="@color/white"
             app:labelVisibilityMode="selected"
-            app:menu="@menu/bottom_menu_admin" />
+            />
     </com.google.android.material.bottomappbar.BottomAppBar>
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

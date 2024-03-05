@@ -21,7 +21,8 @@
             android:layout_width="150dp"
             android:layout_height="150dp"
             android:layout_gravity="start"
-            android:layout_margin="10dp"
+            android:layout_marginStart="10dp"
+            android:layout_marginTop="15dp"
             android:contentDescription="@string/event_name"
             android:src="@drawable/profile_image" />
 

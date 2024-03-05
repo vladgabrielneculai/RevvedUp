@@ -35,9 +35,9 @@ public class HomeFragment extends Fragment {
             DatabaseReference userRef = database.getReference("utilizatori");
             userRef.orderByChild("uid").equalTo(user.getUid()).addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
-                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                    if (dataSnapshot.exists()) {
-                        for (DataSnapshot userSnapshot : dataSnapshot.getChildren()) {
+                public void onDataChange(@NonNull DataSnapshot snapshot) {
+                    if (snapshot.exists()) {
+                        for (DataSnapshot userSnapshot : snapshot.getChildren()) {
                             String fnameFromDb = userSnapshot.child("fname").getValue(String.class);
                             usernameTextView.setText(String.format("Salut, %s!", fnameFromDb));
                         }

@@ -17,7 +17,7 @@
         android:title="@string/car_list"
         android:icon="@drawable/baseline_car_24"/>
     <item
-        android:id="@+id/More"
+        android:id="@+id/more"
         android:title="@string/more"
         android:icon="@drawable/baseline_more_24"/>
 </menu>
