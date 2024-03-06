@@ -30,11 +30,14 @@ public class LoginActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
+        //Firebase instances
+        mAuth = FirebaseAuth.getInstance();
+
+        //Declaration of XML Layout components
         loginEmail = findViewById(R.id.email);
         loginPassword = findViewById(R.id.password);
         loginButton = findViewById(R.id.login_button);
         signupRedirectText = findViewById(R.id.registerRedirectText);
-        mAuth = FirebaseAuth.getInstance();
 
 
         loginButton.setOnClickListener(v -> {
@@ -42,6 +45,7 @@ public class LoginActivity extends AppCompatActivity {
             String email = loginEmail.getText().toString().trim();
             String password = loginPassword.getText().toString().trim();
 
+            //Authentication of the user in the app
             mAuth.signInWithEmailAndPassword(email, password)
                     .addOnCompleteListener(task -> {
                         if (task.isSuccessful()) {
@@ -108,25 +112,5 @@ public class LoginActivity extends AppCompatActivity {
 //
 //            }
 //        });
-//    }
-
-//    private void startAppropriateActivity(String role) {
-//        Intent intent;
-//        switch (role) {
-//            case "Admin":
-//                  intent = new Intent(LoginActivity.this, MainActivityAdmin.class);
-////                startActivity(intent);
-//                break;
-//            case "Organizator":
-//                intent = new Intent(LoginActivity.this, MainActivityAdmin.class);
-//                startActivity(intent);
-//                break;
-//            case "Participant":
-//                intent = new Intent(LoginActivity.this, MainActivityAdmin.class);
-//                startActivity(intent);
-//                break;
-//            default:
-//                break;
-//        }
 //    }
 }

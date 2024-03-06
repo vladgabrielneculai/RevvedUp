@@ -8,6 +8,8 @@ import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
@@ -16,28 +18,44 @@ import java.util.Calendar;
 
 public class AddEventActivity extends AppCompatActivity {
 
+    //  TODO: Create the functionality so that the event admin can add the location of the event (it's better to add the location as an address than to choose the point from the map imo)
+    //  TODO: Create the "evenimente" database
+    //  TODO: Create the functionality so that the event admin can add his personal photo/logo of the event
 
-//    private PlacesClient placesClient;
+    FirebaseDatabase database;
+    FirebaseAuth mAuth;
+    FirebaseUser user;
+    DatabaseReference eventsRef, usersRef;
+    EditText eventName, eventDetails;
+    TextView eventDate;
+    Button pickDate, pickLocation, back, addEvent;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_event);
 
-        FirebaseDatabase database = FirebaseDatabase.getInstance();
-        DatabaseReference eventsRef = database.getReference("evenimente");
+        //Firebase instances
+        database = FirebaseDatabase.getInstance();
+        mAuth = FirebaseAuth.getInstance();
+        user = mAuth.getCurrentUser();
 
-//        Places.initialize(getApplicationContext(), "YOUR_API_KEY");
-//        placesClient = Places.createClient(this);
+        //Access to "evenimente" database
+        eventsRef = database.getReference("evenimente");
 
-        EditText eventName = findViewById(R.id.eventname);
-        EditText eventDetails = findViewById(R.id.eventdetails);
-        TextView eventDate = findViewById(R.id.eventdate);
-        Button pickDate = findViewById(R.id.pickdate);
-        //Button pickLocation = findViewById(R.id.picklocation);
-        Button back = findViewById(R.id.back);
-        Button addEvent = findViewById(R.id.addevent);
+        //Access to "utilizatori" database
+        usersRef = database.getReference("utilizatori");
 
+        //Declaration of XML Layout components
+        eventName = findViewById(R.id.eventname);
+        eventDetails = findViewById(R.id.eventdetails);
+        eventDate = findViewById(R.id.eventdate);
+        pickDate = findViewById(R.id.pickdate);
+        //pickLocation = findViewById(R.id.picklocation);
+        back = findViewById(R.id.back);
+        addEvent = findViewById(R.id.addevent);
+
+        //Date selection logic
         pickDate.setOnClickListener(v -> {
             final Calendar calendar = Calendar.getInstance();
             int year = calendar.get(Calendar.YEAR);
@@ -84,6 +102,7 @@ public class AddEventActivity extends AppCompatActivity {
 //            }
 //        });
 
+        //Button used to create an event and add it to the database
         addEvent.setOnClickListener(v -> {
             String name = eventName.getText().toString();
             String details = eventDetails.getText().toString();
@@ -97,6 +116,7 @@ public class AddEventActivity extends AppCompatActivity {
             finish();
         });
 
+        //Back button
         back.setOnClickListener(v -> {
             finish();
         });

@@ -19,6 +19,8 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.vgn.revvedup.databinding.ActivityMainBinding;
 
+import java.util.Objects;
+
 
 public class MainActivity extends AppCompatActivity {
 
@@ -35,7 +37,7 @@ public class MainActivity extends AppCompatActivity {
 
         replaceFragment(new HomeFragment());
 
-        //Firebase variables for getting the information regarding the user
+        //Firebase instances
         FirebaseAuth mAuth = FirebaseAuth.getInstance();
         FirebaseDatabase database = FirebaseDatabase.getInstance();
         FirebaseUser user = mAuth.getCurrentUser();
@@ -50,7 +52,7 @@ public class MainActivity extends AppCompatActivity {
                         for (DataSnapshot userSnapshot : snapshot.getChildren()) {
                             String roleFromDb = userSnapshot.child("role").getValue(String.class);
 
-                            switch(roleFromDb){
+                            switch (Objects.requireNonNull(roleFromDb)) {
                                 case "Admin":
                                     binding.bottomNavigationView.inflateMenu(R.menu.bottom_menu_admin);
                                     binding.bottomNavigationView.setOnItemSelectedListener(item -> {
@@ -62,7 +64,7 @@ public class MainActivity extends AppCompatActivity {
                                             replaceFragment(new MoreFragment());
                                         } else if (item.getItemId() == R.id.cars) {
                                             replaceFragment(new CarsFragment());
-                                        } else if (item.getItemId() == R.id.users){
+                                        } else if (item.getItemId() == R.id.users) {
                                             replaceFragment(new UsersFragment());
                                         }
                                         return true;
@@ -80,7 +82,7 @@ public class MainActivity extends AppCompatActivity {
                                             startActivity(intent);
                                         } else if (item.getItemId() == R.id.car_approval_list) {
                                             replaceFragment(new CarsFragment());
-                                        } else if (item.getItemId() == R.id.more){
+                                        } else if (item.getItemId() == R.id.more) {
                                             replaceFragment(new MoreFragment());
                                         }
                                         return true;
@@ -98,7 +100,7 @@ public class MainActivity extends AppCompatActivity {
                                             startActivity(intent);
                                         } else if (item.getItemId() == R.id.my_car) {
                                             replaceFragment(new CarsFragment());
-                                        } else if (item.getItemId() == R.id.more){
+                                        } else if (item.getItemId() == R.id.more) {
                                             replaceFragment(new MoreFragment());
                                         }
                                         return true;
@@ -115,7 +117,6 @@ public class MainActivity extends AppCompatActivity {
                 }
             });
         }
-
 
 
     }

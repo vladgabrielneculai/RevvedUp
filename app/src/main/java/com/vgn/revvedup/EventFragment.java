@@ -9,6 +9,10 @@ import androidx.fragment.app.Fragment;
 
 public class EventFragment extends Fragment {
 
+    // TODO: If the user is "admin": display the events from the database
+    // TODO: If the user is "organizator": display his events
+    // TODO: If the user is "participant": display the events based on the recommandation algorithm
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {

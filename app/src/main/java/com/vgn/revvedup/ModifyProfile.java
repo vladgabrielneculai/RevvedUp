@@ -1,12 +1,15 @@
 package com.vgn.revvedup;
 
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Toast;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -17,14 +20,36 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+
+import java.util.Objects;
 
 public class ModifyProfile extends AppCompatActivity {
 
-    Button backButton, modifyButton;
+    // TODO: Create a functionality so that the user can select the profile image from the phone.
+
+    Button backButton, modifyButton, selectProfileImage;
     ImageView imageView;
     EditText firstName, lastName, email, username, password, cpassword;
+    Uri selectedImageUri;
+
+    private static final int REQUEST_IMAGE_CODE = 1;
 
     private boolean isEditMode = false;
+
+    private final ActivityResultLauncher<Intent> launcher = registerForActivityResult(
+            new ActivityResultContracts.StartActivityForResult(),
+            result -> {
+                if (result.getResultCode() == RESULT_OK) {
+                    Intent data = result.getData();
+                    if (data != null) {
+                        selectedImageUri = data.getData();
+                        imageView.setImageURI(selectedImageUri);
+                    }
+                }
+            }
+    );
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -33,6 +58,7 @@ public class ModifyProfile extends AppCompatActivity {
 
         backButton = findViewById(R.id.backtomore);
         modifyButton = findViewById(R.id.savechanges);
+        selectProfileImage = findViewById(R.id.change_image);
         imageView = findViewById(R.id.profileImageView);
         firstName = findViewById(R.id.fname);
         lastName = findViewById(R.id.lname);
@@ -44,18 +70,26 @@ public class ModifyProfile extends AppCompatActivity {
         FirebaseAuth mAuth = FirebaseAuth.getInstance();
         FirebaseUser user = mAuth.getCurrentUser();
 
-        System.out.println(user.getEmail());
-
-
         modifyButton.setText(R.string.modify);
         disableEditText();
 
-        backButton.setOnClickListener(v -> {
-            Intent intent = new Intent(ModifyProfile.this, MainActivity.class);
-            startActivity(intent);
+        populateUserData(Objects.requireNonNull(user));
+
+
+        selectProfileImage.setOnClickListener(v -> {
+            // Create an Intent to choose an image from the gallery or camera
+            Intent intent = new Intent();
+            intent.setType("image/*");
+            intent.setAction(Intent.ACTION_GET_CONTENT);
+
+            // Allow user to choose from gallery or camera
+            Intent chooser = Intent.createChooser(intent, "Alege o fotografie de profil");
+
+            // Launch the activity using the ActivityResultLauncher
+            launcher.launch(chooser);
         });
 
-        populateUserData(user);
+
 
         modifyButton.setOnClickListener(v -> {
             if (!isEditMode) {
@@ -63,8 +97,8 @@ public class ModifyProfile extends AppCompatActivity {
                 enableEditText();
                 isEditMode = true;
             } else {
-                if (cpassword.equals(password)) {
-                    updateDataInDatabase();
+                if (cpassword.getText().toString().trim().equals(password.getText().toString().trim())) {
+                    updateDataInDatabase(user);
                     modifyButton.setText(R.string.modify);
                     disableEditText();
                     isEditMode = false;
@@ -79,6 +113,8 @@ public class ModifyProfile extends AppCompatActivity {
                 }
             }
         });
+
+        backButton.setOnClickListener(v -> finish());
     }
 
     private void populateUserData(FirebaseUser user) {
@@ -111,28 +147,64 @@ public class ModifyProfile extends AppCompatActivity {
         });
     }
 
-    private void updateDataInDatabase() {
+    private void updateDataInDatabase(FirebaseUser user) {
         String newFirstName = firstName.getText().toString();
         String newLastName = lastName.getText().toString();
-        String newEmail = email.getText().toString();
         String newUsername = username.getText().toString();
         String newPassword = password.getText().toString();
 
         DatabaseReference userRef = FirebaseDatabase.getInstance().getReference("utilizatori");
-        userRef.child("fname").setValue(newFirstName);
-        userRef.child("lname").setValue(newLastName);
-        userRef.child("email").setValue(newEmail);
-        userRef.child("username").setValue(newUsername);
-        userRef.child("password").setValue(newPassword);
+
+        userRef.orderByChild("uid").equalTo(user.getUid()).addListenerForSingleValueEvent(new ValueEventListener() {
+
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if (snapshot.exists()) {
+                    for (DataSnapshot userSnapshot : snapshot.getChildren()) {
+                        String userId = userSnapshot.getKey();
+
+                        userRef.child(Objects.requireNonNull(userId)).child("fname").setValue(newFirstName);
+                        userRef.child(Objects.requireNonNull(userId)).child("lname").setValue(newLastName);
+                        userRef.child(Objects.requireNonNull(userId)).child("username").setValue(newUsername);
+                        userRef.child(Objects.requireNonNull(userId)).child("password").setValue(newPassword);
+
+                    }
 
 
+                    if (selectedImageUri != null) {
+                        // Upload the image to Firebase Storage
+                        StorageReference storageReference = FirebaseStorage.getInstance().getReference();
+                        StorageReference imageRef = storageReference.child("profile_images/" + user.getUid());
+                        imageRef.putFile(selectedImageUri).addOnSuccessListener(taskSnapshot -> {
+                            // Get the download URL of the uploaded image
+                            imageRef.getDownloadUrl().addOnCompleteListener(task -> {
+                                if (task.isSuccessful()) {
+                                    String imageUrl = task.getResult().toString();
+
+                                    // Update the user data with the image URL in the database
+                                    userRef.child("imageUrl").setValue(imageUrl);
+                                }
+                            });
+                        }).addOnFailureListener(e -> {
+                            // Handle image upload failure
+                            Toast.makeText(ModifyProfile.this, "Error uploading image!", Toast.LENGTH_SHORT).show();
+                        });
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
     }
 
     private void enableEditText() {
         firstName.setEnabled(true);
         lastName.setEnabled(true);
         username.setEnabled(true);
-        email.setEnabled(true);
+        email.setEnabled(false);
         password.setEnabled(true);
         cpassword.setEnabled(true);
     }
