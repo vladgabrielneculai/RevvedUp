@@ -56,4 +56,7 @@
     <string name="cars_existent">Masinile existente</string>
     <string name="users_existent">Utilizatori existenti</string>
     <string name="delete_user">Șterge utilizator</string>
+    <string name="endDate">Dată final</string>
+    <string name="startDate">Dată început</string>
+    <string name="details">Detalii</string>
 </resources>

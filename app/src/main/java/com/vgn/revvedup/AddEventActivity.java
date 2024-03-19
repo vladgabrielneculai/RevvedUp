@@ -19,7 +19,6 @@ import java.util.Calendar;
 public class AddEventActivity extends AppCompatActivity {
 
     //  TODO: Create the functionality so that the event admin can add the location of the event (it's better to add the location as an address than to choose the point from the map imo)
-    //  TODO: Create the "events" database
     //  TODO: Create the functionality so that the event admin can add his personal photo/logo of the event
 
     FirebaseDatabase database;
@@ -40,7 +39,7 @@ public class AddEventActivity extends AppCompatActivity {
         mAuth = FirebaseAuth.getInstance();
         user = mAuth.getCurrentUser();
 
-        //Access to "evenimente" database
+        //Access to "events" database
         eventsRef = database.getReference("events");
 
         //Access to "users" database
@@ -125,11 +124,12 @@ public class AddEventActivity extends AppCompatActivity {
             String startDate = eventStartDate.getText().toString();
             String endDate = eventEndDate.getText().toString();
             String eventOwner = user.getEmail();
+            String eventImage = "";
             String location = "";
 
-            Event event = new Event(name, details, startDate, endDate, location, eventOwner);
+            Event event = new Event(name, details, startDate, endDate, location, eventImage, eventOwner);
 
-            eventsRef.push().setValue(event);
+            eventsRef.child(name).setValue(event);
 
             finish();
         });
