@@ -2,15 +2,16 @@ package com.vgn.revvedup;
 
 public class User {
 
-    String fname, lname, email, username, password, role, uid;
+    String fname, lname, email, username, password, role, imagePath, uid;
 
-    public User(String fname, String lname, String username, String email, String password, String role, String uid) {
+    public User(String fname, String lname, String username, String email, String password, String role, String imagePath, String uid) {
         this.fname = fname;
         this.lname = lname;
         this.email = email;
         this.username = username;
         this.password = password;
         this.role = role;
+        this.imagePath = imagePath;
         this.uid = uid;
     }
 
@@ -71,5 +72,13 @@ public class User {
 
     public void setUid(String uid) {
         this.uid = uid;
+    }
+
+    public String getImagePath() {
+        return imagePath;
+    }
+
+    public void setImagePath(String imagePath) {
+        this.imagePath = imagePath;
     }
 }

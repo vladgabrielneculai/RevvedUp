@@ -19,7 +19,7 @@ import java.util.Calendar;
 public class AddEventActivity extends AppCompatActivity {
 
     //  TODO: Create the functionality so that the event admin can add the location of the event (it's better to add the location as an address than to choose the point from the map imo)
-    //  TODO: Create the "evenimente" database
+    //  TODO: Create the "events" database
     //  TODO: Create the functionality so that the event admin can add his personal photo/logo of the event
 
     FirebaseDatabase database;
@@ -27,8 +27,8 @@ public class AddEventActivity extends AppCompatActivity {
     FirebaseUser user;
     DatabaseReference eventsRef, usersRef;
     EditText eventName, eventDetails;
-    TextView eventDate;
-    Button pickDate, pickLocation, back, addEvent;
+    TextView eventStartDate, eventEndDate;
+    Button pickStartDate, pickEndDate, pickLocation, back, addEvent;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,22 +41,24 @@ public class AddEventActivity extends AppCompatActivity {
         user = mAuth.getCurrentUser();
 
         //Access to "evenimente" database
-        eventsRef = database.getReference("evenimente");
+        eventsRef = database.getReference("events");
 
-        //Access to "utilizatori" database
-        usersRef = database.getReference("utilizatori");
+        //Access to "users" database
+        usersRef = database.getReference("users");
 
         //Declaration of XML Layout components
         eventName = findViewById(R.id.eventname);
         eventDetails = findViewById(R.id.eventdetails);
-        eventDate = findViewById(R.id.eventdate);
-        pickDate = findViewById(R.id.pickdate);
+        eventStartDate = findViewById(R.id.eventStartDate);
+        eventEndDate = findViewById(R.id.eventEndDate);
+        pickStartDate = findViewById(R.id.pickStartDate);
+        pickEndDate = findViewById(R.id.pickEndDate);
         //pickLocation = findViewById(R.id.picklocation);
         back = findViewById(R.id.back);
         addEvent = findViewById(R.id.addevent);
 
         //Date selection logic
-        pickDate.setOnClickListener(v -> {
+        pickStartDate.setOnClickListener(v -> {
             final Calendar calendar = Calendar.getInstance();
             int year = calendar.get(Calendar.YEAR);
             int month = calendar.get(Calendar.MONTH);
@@ -65,7 +67,21 @@ public class AddEventActivity extends AppCompatActivity {
             DatePickerDialog datePickerDialog = new DatePickerDialog(AddEventActivity.this,
                     (view, year1, monthOfYear, dayOfMonth) -> {
                         // Update event date text
-                        eventDate.setText(String.format("%d/%d/%d", dayOfMonth, monthOfYear + 1, year1));
+                        eventStartDate.setText(String.format("%d/%d/%d", dayOfMonth, monthOfYear + 1, year1));
+                    }, year, month, day);
+            datePickerDialog.show();
+        });
+
+        pickEndDate.setOnClickListener(v -> {
+            final Calendar calendar = Calendar.getInstance();
+            int year = calendar.get(Calendar.YEAR);
+            int month = calendar.get(Calendar.MONTH);
+            int day = calendar.get(Calendar.DAY_OF_MONTH);
+
+            DatePickerDialog datePickerDialog = new DatePickerDialog(AddEventActivity.this,
+                    (view, year1, monthOfYear, dayOfMonth) -> {
+                        // Update event date text
+                        eventEndDate.setText(String.format("%d/%d/%d", dayOfMonth, monthOfYear + 1, year1));
                     }, year, month, day);
             datePickerDialog.show();
         });
@@ -106,10 +122,12 @@ public class AddEventActivity extends AppCompatActivity {
         addEvent.setOnClickListener(v -> {
             String name = eventName.getText().toString();
             String details = eventDetails.getText().toString();
-            String date = eventDate.getText().toString();
+            String startDate = eventStartDate.getText().toString();
+            String endDate = eventEndDate.getText().toString();
+            String eventOwner = user.getEmail();
             String location = "";
 
-            Event event = new Event(name, details, date, location);
+            Event event = new Event(name, details, startDate, endDate, location, eventOwner);
 
             eventsRef.push().setValue(event);
 
@@ -117,9 +135,7 @@ public class AddEventActivity extends AppCompatActivity {
         });
 
         //Back button
-        back.setOnClickListener(v -> {
-            finish();
-        });
+        back.setOnClickListener(v -> finish());
 
 
     }

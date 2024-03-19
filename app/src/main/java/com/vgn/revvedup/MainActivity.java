@@ -44,7 +44,7 @@ public class MainActivity extends AppCompatActivity {
 
         //Verification of the user role in order to display the menu accordingly
         if (user != null) {
-            DatabaseReference userRef = database.getReference("utilizatori");
+            DatabaseReference userRef = database.getReference("users");
             userRef.orderByChild("uid").equalTo(user.getUid()).addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot snapshot) {

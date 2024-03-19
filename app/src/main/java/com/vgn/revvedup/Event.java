@@ -2,12 +2,15 @@ package com.vgn.revvedup;
 
 public class Event {
 
-    private String name;
-    private String details;
-    private String date;
-    private String location;
+    private String name, details, startDate, endDate, location, eventOwner;
 
-    public Event(String name, String details, String date, String location) {
+    public Event(String name, String details, String startDate, String endDate, String location, String eventOwner) {
+        this.name = name;
+        this.details = details;
+        this.startDate = startDate;
+        this.endDate = endDate;
+        this.location = location;
+        this.eventOwner = eventOwner;
     }
 
     public Event() {
@@ -29,12 +32,20 @@ public class Event {
         this.details = details;
     }
 
-    public String getDate() {
-        return date;
+    public String getStartDate() {
+        return startDate;
     }
 
-    public void setDate(String date) {
-        this.date = date;
+    public void setStartDate(String startDate) {
+        this.startDate = startDate;
+    }
+
+    public String getEndDate() {
+        return endDate;
+    }
+
+    public void setEndDate(String endDate) {
+        this.endDate = endDate;
     }
 
     public String getLocation() {
@@ -43,5 +54,13 @@ public class Event {
 
     public void setLocation(String location) {
         this.location = location;
+    }
+
+    public String getEventOwner() {
+        return eventOwner;
+    }
+
+    public void setEventOwner(String eventOwner) {
+        this.eventOwner = eventOwner;
     }
 }

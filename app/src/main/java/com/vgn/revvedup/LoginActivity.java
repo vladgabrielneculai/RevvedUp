@@ -65,7 +65,7 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     private void fetchUserRole(String email) {
-        DatabaseReference usersRef = FirebaseDatabase.getInstance().getReference().child("utilizatori");
+        DatabaseReference usersRef = FirebaseDatabase.getInstance().getReference().child("users");
         usersRef.orderByChild("email").equalTo(email).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
@@ -90,7 +90,7 @@ public class LoginActivity extends AppCompatActivity {
     }
 
 //    private void checkPassword(String password) {
-//        DatabaseReference usersRef = FirebaseDatabase.getInstance().getReference().child("utilizatori");
+//        DatabaseReference usersRef = FirebaseDatabase.getInstance().getReference().child("users");
 //        usersRef.orderByChild("password").equalTo(password).addListenerForSingleValueEvent(new ValueEventListener() {
 //            @Override
 //            public void onDataChange(@NonNull DataSnapshot snapshot) {

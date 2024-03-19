@@ -5,6 +5,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.SearchView;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
@@ -23,8 +24,8 @@ import java.util.List;
 public class UsersFragment extends Fragment {
 
     private FirebaseDatabase database;
-    private List<User> users; // List to store user data
-    private UserAdapter adapter; // Adapter to display users in RecyclerView
+    private List<User> users;
+    private UserAdapter adapter;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -36,33 +37,70 @@ public class UsersFragment extends Fragment {
         database = FirebaseDatabase.getInstance();
         users = new ArrayList<>();
 
-        // Initialize RecyclerView and Adapter
         RecyclerView userRecyclerView = view.findViewById(R.id.userRecyclerView);
+        SearchView searchView = view.findViewById(R.id.searchView);
         userRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         adapter = new UserAdapter(users);
         userRecyclerView.setAdapter(adapter);
 
-        // Fetch users from Firebase Realtime Database
         fetchUsers();
+
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                return false;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                fetchUsers(newText);
+                return false;
+            }
+        });
 
         return view;
     }
 
     private void fetchUsers() {
-        DatabaseReference usersRef = database.getReference("utilizatori"); // Reference to "utilizatori" node
+        DatabaseReference usersRef = database.getReference("users"); // Reference to "users" node
 
         usersRef.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                users.clear(); // Clear existing user data
+                users.clear();
                 for (DataSnapshot childSnapshot : snapshot.getChildren()) {
-                    // Extract user data from each child node and add to the list
                     User user = childSnapshot.getValue(User.class);
                     if (user != null) {
                         users.add(user);
                     }
                 }
-                // Notify adapter about data change to update the view
+
+                adapter.notifyDataSetChanged();
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                Log.w("UsersFragment", "Failed to fetch users:", error.toException());
+            }
+        });
+    }
+
+    private void fetchUsers(String searchTerm) {
+        DatabaseReference usersRef = database.getReference("users");
+
+        usersRef.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                users.clear();
+                for (DataSnapshot childSnapshot : snapshot.getChildren()) {
+                    User user = childSnapshot.getValue(User.class);
+                    if (user != null) {
+                        if (user.getFname().toLowerCase().contains(searchTerm.toLowerCase()) ||
+                                user.getRole().toLowerCase().contains(searchTerm.toLowerCase()) || user.getLname().toLowerCase().contains(searchTerm.toLowerCase())) {
+                            users.add(user);
+                        }
+                    }
+                }
                 adapter.notifyDataSetChanged();
             }
 

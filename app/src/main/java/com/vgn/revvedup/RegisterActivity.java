@@ -53,7 +53,7 @@ public class RegisterActivity extends AppCompatActivity {
 
         mAuth = FirebaseAuth.getInstance();
         database = FirebaseDatabase.getInstance();
-        reference = database.getReference("utilizatori");
+        reference = database.getReference("users");
 
         adapterUserType = new ArrayAdapter<String>(this, R.layout.user_type, item);
         autoCompleteTextView.setAdapter(adapterUserType);
@@ -103,7 +103,8 @@ public class RegisterActivity extends AppCompatActivity {
                         FirebaseUser user = mAuth.getCurrentUser();
                         if (user != null) {
                             String uid = user.getUid();
-                            User newUser = new User(fname, lname, username, email, password, role, uid);
+                            String imagePath = "gs://revvedup-f1c15.appspot.com/profile_image.png";
+                            User newUser = new User(fname, lname, username, email, password, role, imagePath, uid);
                             reference.child(username).setValue(newUser);
                             Toast.makeText(RegisterActivity.this, "V-ați autentificat cu succes!", Toast.LENGTH_SHORT).show();
                             Intent intent = new Intent(this, LoginActivity.class);

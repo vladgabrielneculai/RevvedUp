@@ -44,7 +44,7 @@ public class HomeFragment extends Fragment {
         user = mAuth.getCurrentUser();
 
         if (user != null) {
-            DatabaseReference userRef = database.getReference("utilizatori");
+            DatabaseReference userRef = database.getReference("users");
             userRef.orderByChild("uid").equalTo(user.getUid()).addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot snapshot) {

@@ -33,9 +33,6 @@ public class ModifyProfile extends AppCompatActivity {
     ImageView imageView;
     EditText firstName, lastName, email, username, password, cpassword;
     Uri selectedImageUri;
-
-    private static final int REQUEST_IMAGE_CODE = 1;
-
     private boolean isEditMode = false;
 
     private final ActivityResultLauncher<Intent> launcher = registerForActivityResult(
@@ -88,7 +85,6 @@ public class ModifyProfile extends AppCompatActivity {
             // Launch the activity using the ActivityResultLauncher
             launcher.launch(chooser);
         });
-
 
 
         modifyButton.setOnClickListener(v -> {
@@ -168,28 +164,34 @@ public class ModifyProfile extends AppCompatActivity {
                         userRef.child(Objects.requireNonNull(userId)).child("username").setValue(newUsername);
                         userRef.child(Objects.requireNonNull(userId)).child("password").setValue(newPassword);
 
+                        // Update user data with image URL (optional)
+                        if (selectedImageUri != null) {
+                            // Upload the image to Firebase Storage
+                            StorageReference storageReference = FirebaseStorage.getInstance().getReference();
+
+                            // Create a reference to the user's specific subfolder
+                            StorageReference userImageRef = storageReference.child("profile_images/" + user.getUid() + "/");
+
+                            // Upload the image with the userImageRef
+                            userImageRef.putFile(selectedImageUri)
+                                    .addOnSuccessListener(taskSnapshot -> {
+                                        // Get the download URL of the uploaded image
+                                        userImageRef.getDownloadUrl().addOnCompleteListener(task -> {
+                                            if (task.isSuccessful()) {
+                                                String imagePath = task.getResult().toString();
+
+                                                // Update the user data with the image URL in the database
+                                                userRef.child(userId).child("imagePath").setValue(imagePath);
+                                            }
+                                        });
+                                    })
+                                    .addOnFailureListener(e -> {
+                                        // Handle image upload failure
+                                        Toast.makeText(ModifyProfile.this, "Error uploading image!", Toast.LENGTH_SHORT).show();
+                                    });
+                        }
                     }
 
-
-                    if (selectedImageUri != null) {
-                        // Upload the image to Firebase Storage
-                        StorageReference storageReference = FirebaseStorage.getInstance().getReference();
-                        StorageReference imageRef = storageReference.child("profile_images/" + user.getUid());
-                        imageRef.putFile(selectedImageUri).addOnSuccessListener(taskSnapshot -> {
-                            // Get the download URL of the uploaded image
-                            imageRef.getDownloadUrl().addOnCompleteListener(task -> {
-                                if (task.isSuccessful()) {
-                                    String imageUrl = task.getResult().toString();
-
-                                    // Update the user data with the image URL in the database
-                                    userRef.child("imageUrl").setValue(imageUrl);
-                                }
-                            });
-                        }).addOnFailureListener(e -> {
-                            // Handle image upload failure
-                            Toast.makeText(ModifyProfile.this, "Error uploading image!", Toast.LENGTH_SHORT).show();
-                        });
-                    }
                 }
             }
 
@@ -201,6 +203,7 @@ public class ModifyProfile extends AppCompatActivity {
     }
 
     private void enableEditText() {
+        selectProfileImage.setEnabled(true);
         firstName.setEnabled(true);
         lastName.setEnabled(true);
         username.setEnabled(true);
@@ -210,6 +213,7 @@ public class ModifyProfile extends AppCompatActivity {
     }
 
     private void disableEditText() {
+        selectProfileImage.setEnabled(false);
         firstName.setEnabled(false);
         lastName.setEnabled(false);
         username.setEnabled(false);
