@@ -59,4 +59,24 @@
     <string name="endDate">Dată final</string>
     <string name="startDate">Dată început</string>
     <string name="details">Detalii</string>
+    <string name="add_car">Adaugă mașină</string>
+    <string name="add_images">Adaugă fotografii</string>
+    <string name="car_brand">Marcă autovehicul</string>
+    <string name="choose_car_brand">Alege marca auto</string>
+    <string name="choose_car_model">Alege model auto</string>
+    <string name="car_model">Model autovehicul</string>
+    <string name="car_registration_number">Număr de înmatriculare</string>
+    <string name="car_registration_example">ex: B123ABC</string>
+    <string name="accepted_mods">Tipul de modificări admise</string>
+    <string name="exhaust">Evacuare</string>
+    <string name="coilovers">Suspensii/Arcuri</string>
+    <string name="bodykit">Modificări ale caroseriei</string>
+    <string name="rims">Jante</string>
+    <string name="performance_mods">Modificări ale motorului</string>
+    <string name="event_competitions">Concursuri în cadrul evenimentului</string>
+    <string name="loudest_pipe">Loudest pipe</string>
+    <string name="limbo">Limbo</string>
+    <string name="best_car_of_the_show">Best Car of The Show</string>
+    <string name="noLikes">0</string>
+    <string name="event_location">Locație eveniment</string>
 </resources>

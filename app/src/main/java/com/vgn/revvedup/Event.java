@@ -1,10 +1,14 @@
 package com.vgn.revvedup;
 
+import java.util.List;
+
 public class Event {
 
     private String name, details, startDate, endDate, location, eventImage, eventOwner;
+    private int noLikes, noCars;
+    private List<String> modsAllowed, eventCompetitions;
 
-    public Event(String name, String details, String startDate, String endDate, String location,String eventImage, String eventOwner) {
+    public Event(String name, String details, String startDate, String endDate, String location, String eventImage, String eventOwner, List<String> modsAllowed, List<String> eventCompetitions, int noLikes, int noCars) {
         this.name = name;
         this.details = details;
         this.startDate = startDate;
@@ -12,6 +16,10 @@ public class Event {
         this.location = location;
         this.eventImage = eventImage;
         this.eventOwner = eventOwner;
+        this.modsAllowed = modsAllowed;
+        this.eventCompetitions = eventCompetitions;
+        this.noLikes = noLikes;
+        this.noCars = noCars;
     }
 
     public Event() {
@@ -57,11 +65,11 @@ public class Event {
         this.location = location;
     }
 
-    public String getEventImage(){
+    public String getEventImage() {
         return eventImage;
     }
 
-    public void setEventImage(String eventImage){
+    public void setEventImage(String eventImage) {
         this.eventImage = eventImage;
     }
 
@@ -71,5 +79,37 @@ public class Event {
 
     public void setEventOwner(String eventOwner) {
         this.eventOwner = eventOwner;
+    }
+
+    public int getNoLikes() {
+        return noLikes;
+    }
+
+    public void setNoLikes(int noLikes) {
+        this.noLikes = noLikes;
+    }
+
+    public int getNoCars() {
+        return noCars;
+    }
+
+    public void setNoCars(int noCars) {
+        this.noCars = noCars;
+    }
+
+    public List<String> getModsAllowed() {
+        return modsAllowed;
+    }
+
+    public void setModsAllowed(List<String> modsAllowed) {
+        this.modsAllowed = modsAllowed;
+    }
+
+    public List<String> getEventCompetitions() {
+        return eventCompetitions;
+    }
+
+    public void setEventCompetitions(List<String> eventCompetitions) {
+        this.eventCompetitions = eventCompetitions;
     }
 }

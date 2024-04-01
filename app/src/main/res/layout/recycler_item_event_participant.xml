@@ -21,15 +21,16 @@
             android:layout_width="150dp"
             android:layout_height="150dp"
             android:layout_gravity="start"
-            android:layout_margin="10dp"
+            android:layout_margin="20dp"
             android:contentDescription="@string/event_name"
-            android:src="@drawable/revvedup_logo" />
+            android:src="@drawable/empty_image" />
 
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="end"
             android:layout_marginEnd="20dp"
+            android:layout_marginTop="10dp"
             android:layout_marginBottom="10dp"
             android:orientation="vertical">
 
@@ -48,25 +49,66 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"
+                android:layout_marginTop="5dp"
                 android:text="@string/event_date"
                 android:textSize="16sp"
                 android:textStyle="bold" />
 
-            <Button
+            <TextView
+                android:id="@+id/eventLocationTextView"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"
-                android:layout_marginTop="10dp"
-                android:text="@string/see_details"
-                android:textColor="#795548"
-                android:textStyle="bold"
-                app:cornerRadius="30dp" />
+                android:layout_marginTop="5dp"
+                android:text="@string/event_location"
+                android:textSize="16sp"
+                android:textStyle="bold" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="5dp"
+                android:gravity="center_horizontal"
+                android:orientation="horizontal">
+
+                <ImageButton
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
+                    android:background="@color/white"
+                    android:src="@drawable/baseline_like_notfilled_24" />
+
+                <TextView
+                    android:id="@+id/likes"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="0dp"
+                    android:layout_marginTop="1dp"
+                    android:text="@string/noLikes"
+                    android:textSize="20sp" />
+
+                <ImageButton
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
+                    android:background="@color/white"
+                    android:src="@drawable/baseline_car_24" />
+
+                <TextView
+                    android:id="@+id/cars"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="0dp"
+                    android:layout_marginTop="1dp"
+                    android:text="@string/noLikes"
+                    android:textSize="20sp" />
+
+
+            </LinearLayout>
 
             <Button
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"
-                android:text="@string/delete_event"
+                android:text="@string/see_details"
                 android:textColor="#795548"
                 android:textStyle="bold"
                 app:cornerRadius="30dp" />

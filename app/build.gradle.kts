@@ -9,7 +9,7 @@ android {
 
     defaultConfig {
         applicationId = "com.vgn.revvedup"
-        minSdk = 26
+        minSdk = 30
         versionCode = 1
         versionName = "1.0"
 
@@ -46,9 +46,10 @@ dependencies {
     implementation("androidx.navigation:navigation-fragment:2.7.7")
     implementation("androidx.navigation:navigation-ui:2.7.7")
     implementation("com.google.android.gms:play-services-location:21.2.0")
-    implementation("com.google.android.libraries.places:places:3.3.0")
+    implementation("com.google.android.libraries.places:places:3.4.0")
     implementation("com.google.android.gms:play-services-places:17.0.0")
     implementation("com.google.firebase:firebase-storage:20.3.0")
+    implementation("androidx.cardview:cardview:1.0.0")
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.1.5")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
