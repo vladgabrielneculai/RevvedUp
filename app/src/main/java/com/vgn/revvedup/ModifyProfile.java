@@ -1,6 +1,5 @@
 package com.vgn.revvedup;
 
-import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.widget.Button;
@@ -8,6 +7,7 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Toast;
 
+import androidx.activity.result.ActivityResultCallback;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
@@ -27,26 +27,36 @@ import java.util.Objects;
 
 public class ModifyProfile extends AppCompatActivity {
 
-    // TODO: Create a functionality so that the user can select the profile image from the phone.
+    private static final int IMAGE_PICK_CODE = 100;  // Request code for image selection
+
+    FirebaseAuth mAuth;
+    FirebaseUser user;
+    FirebaseStorage storage;
+    StorageReference storageRef;
+    DatabaseReference usersRef;
 
     Button backButton, modifyButton, selectProfileImage;
-    ImageView imageView;
+    ImageView profileImageView;
     EditText firstName, lastName, email, username, password, cpassword;
     Uri selectedImageUri;
     private boolean isEditMode = false;
 
-    private final ActivityResultLauncher<Intent> launcher = registerForActivityResult(
-            new ActivityResultContracts.StartActivityForResult(),
-            result -> {
-                if (result.getResultCode() == RESULT_OK) {
-                    Intent data = result.getData();
-                    if (data != null) {
-                        selectedImageUri = data.getData();
-                        imageView.setImageURI(selectedImageUri);
+    private final ActivityResultLauncher<String> imagePickerLauncher = registerForActivityResult(new ActivityResultContracts.GetContent(),
+            new ActivityResultCallback<Uri>() {
+                @Override
+                public void onActivityResult(Uri uri) {
+                    if (uri != null) {
+                        // Image is selected successfully, use the URI
+                        selectedImageUri = uri;
+                        profileImageView.setImageURI(uri);
+                    } else {
+                        // If the URI is null, the user canceled the image selection, handle it accordingly
+                        // For example, you might want to show a message to the user
+                        Toast.makeText(ModifyProfile.this, "Image selection canceled", Toast.LENGTH_SHORT).show();
                     }
                 }
-            }
-    );
+            });
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,7 +66,7 @@ public class ModifyProfile extends AppCompatActivity {
         backButton = findViewById(R.id.backtomore);
         modifyButton = findViewById(R.id.savechanges);
         selectProfileImage = findViewById(R.id.change_image);
-        imageView = findViewById(R.id.profileImageView);
+        profileImageView = findViewById(R.id.profileImageView);
         firstName = findViewById(R.id.fname);
         lastName = findViewById(R.id.lname);
         email = findViewById(R.id.email);
@@ -64,28 +74,18 @@ public class ModifyProfile extends AppCompatActivity {
         password = findViewById(R.id.password);
         cpassword = findViewById(R.id.cpassword);
 
-        FirebaseAuth mAuth = FirebaseAuth.getInstance();
-        FirebaseUser user = mAuth.getCurrentUser();
+        mAuth = FirebaseAuth.getInstance();
+        user = mAuth.getCurrentUser();
 
         modifyButton.setText(R.string.modify);
         disableEditText();
 
         populateUserData(Objects.requireNonNull(user));
 
-
         selectProfileImage.setOnClickListener(v -> {
-            // Create an Intent to choose an image from the gallery or camera
-            Intent intent = new Intent();
-            intent.setType("image/*");
-            intent.setAction(Intent.ACTION_GET_CONTENT);
-
-            // Allow user to choose from gallery or camera
-            Intent chooser = Intent.createChooser(intent, "Alege o fotografie de profil");
-
-            // Launch the activity using the ActivityResultLauncher
-            launcher.launch(chooser);
+            // Launch the image picker activity
+            imagePickerLauncher.launch("image/*");
         });
-
 
         modifyButton.setOnClickListener(v -> {
             if (!isEditMode) {
@@ -164,7 +164,7 @@ public class ModifyProfile extends AppCompatActivity {
                         userRef.child(Objects.requireNonNull(userId)).child("username").setValue(newUsername);
                         userRef.child(Objects.requireNonNull(userId)).child("password").setValue(newPassword);
 
-                        // Update user data with image URL (optional)
+                        // Update user data with profile image URL (optional)
                         if (selectedImageUri != null) {
                             // Upload the image to Firebase Storage
                             StorageReference storageReference = FirebaseStorage.getInstance().getReference();
@@ -221,6 +221,4 @@ public class ModifyProfile extends AppCompatActivity {
         password.setEnabled(false);
         cpassword.setEnabled(false);
     }
-
-
 }
