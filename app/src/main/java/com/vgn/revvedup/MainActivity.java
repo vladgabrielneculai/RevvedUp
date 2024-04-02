@@ -96,7 +96,7 @@ public class MainActivity extends AppCompatActivity {
                                         } else if (item.getItemId() == R.id.event) {
                                             replaceFragment(new EventFragment());
                                         } else if (item.getItemId() == R.id.add) {
-                                            Intent intent = new Intent(MainActivity.this, AddEventActivity.class);
+                                            Intent intent = new Intent(MainActivity.this, AddCarActivity.class);
                                             startActivity(intent);
                                         } else if (item.getItemId() == R.id.my_car) {
                                             replaceFragment(new CarsFragment());

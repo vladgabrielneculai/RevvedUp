@@ -165,20 +165,19 @@
                     android:textColor="@color/black"
                     android:textSize="16sp" />
 
-                <com.google.android.material.textfield.TextInputLayout
-                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.Dense.ExposedDropdownMenu"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="3">
-
-                    <AutoCompleteTextView
-                        android:id="@+id/autoComplete_carBrand"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:hint="@string/choose_car_brand"
-                        android:inputType="none" />
-
-                </com.google.android.material.textfield.TextInputLayout>
+                <EditText
+                    android:id="@+id/carBrand"
+                    android:layout_width="100dp"
+                    android:layout_height="50dp"
+                    android:layout_weight="3"
+                    android:autofillHints=""
+                    android:background="@drawable/midnight_blue_border"
+                    android:hint="@string/car_brand_example"
+                    android:inputType="text"
+                    android:paddingStart="20dp"
+                    android:paddingEnd="20dp"
+                    android:textColor="@color/midnight_blue"
+                    android:textSize="15sp" />
 
             </TableRow>
 
@@ -193,20 +192,19 @@
                     android:textColor="@color/black"
                     android:textSize="16sp" />
 
-                <com.google.android.material.textfield.TextInputLayout
-                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.Dense.ExposedDropdownMenu"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="3">
-
-                    <AutoCompleteTextView
-                        android:id="@+id/autoComplete_carModel"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:hint="@string/choose_car_model"
-                        android:inputType="none" />
-
-                </com.google.android.material.textfield.TextInputLayout>
+                <EditText
+                    android:id="@+id/carModel"
+                    android:layout_width="100dp"
+                    android:layout_height="50dp"
+                    android:layout_weight="3"
+                    android:autofillHints=""
+                    android:background="@drawable/midnight_blue_border"
+                    android:hint="@string/car_model_example"
+                    android:inputType="text"
+                    android:paddingStart="20dp"
+                    android:paddingEnd="20dp"
+                    android:textColor="@color/midnight_blue"
+                    android:textSize="15sp" />
 
             </TableRow>
 
@@ -237,8 +235,80 @@
 
             </TableRow>
 
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+
+                android:text="@string/car_mods_applied"
+                android:textColor="@color/black"
+                android:textSize="16sp" />
+
+            <CheckBox
+                android:id="@+id/exhaust"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/exhaust"
+                android:textColor="@color/black"
+                android:textSize="16sp" />
+
+            <CheckBox
+                android:id="@+id/coilovers"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/coilovers"
+                android:textColor="@color/black"
+                android:textSize="16sp" />
+
+            <CheckBox
+                android:id="@+id/bodykit"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/bodykit"
+                android:textColor="@color/black"
+                android:textSize="16sp" />
+
+            <CheckBox
+                android:id="@+id/rims"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/rims"
+                android:textColor="@color/black"
+                android:textSize="16sp" />
+
+            <CheckBox
+                android:id="@+id/performance_mods"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/performance_mods"
+                android:textColor="@color/black"
+                android:textSize="16sp" />
+
 
         </TableLayout>
+
+        <Button
+            android:id="@+id/addCar"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:layout_marginLeft="15dp"
+            android:layout_marginRight="15dp"
+            android:layout_marginBottom="5dp"
+            android:backgroundTint="@color/golden_yellow"
+            android:text="@string/add_car"
+            android:textSize="18sp"
+            app:cornerRadius="30dp" />
+
+        <Button
+            android:id="@+id/back"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:layout_marginLeft="15dp"
+            android:layout_marginRight="15dp"
+            android:backgroundTint="@color/golden_yellow"
+            android:text="@string/back"
+            android:textSize="18sp"
+            app:cornerRadius="30dp" />
 
     </LinearLayout>
 

@@ -3,10 +3,13 @@ package com.vgn.revvedup;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
+
+import com.bumptech.glide.Glide;
 
 import java.util.List;
 
@@ -29,8 +32,14 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.UserViewHolder
     public void onBindViewHolder(@NonNull UserViewHolder holder, int position) {
         User user = users.get(position);
         holder.usernameTextView.setText(String.format("%s %s", user.getFname(), user.getLname()));
-        // Update other views with user data
         holder.roleTextView.setText(user.getRole());
+
+        // Load and display the image using Glide
+        Glide.with(holder.itemView.getContext())
+                .load(user.getImagePath()) // Load image URL
+                .placeholder(R.drawable.empty_image) // Placeholder image while loading
+                .error(R.drawable.error_image) // Error image if loading fails
+                .into(holder.userImageView); // ImageView to display the image
     }
 
     @Override
@@ -41,12 +50,14 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.UserViewHolder
     public static class UserViewHolder extends RecyclerView.ViewHolder {
 
         private final TextView usernameTextView;
-        private final TextView roleTextView; // New TextView for role
+        private final TextView roleTextView;
+        private final ImageView userImageView;
 
         public UserViewHolder(@NonNull View itemView) {
             super(itemView);
             usernameTextView = itemView.findViewById(R.id.usernameTextView);
-            roleTextView = itemView.findViewById(R.id.roleTextView); // New TextView with ID
+            roleTextView = itemView.findViewById(R.id.roleTextView);
+            userImageView = itemView.findViewById(R.id.img);
         }
     }
 }

@@ -59,7 +59,7 @@
     <string name="endDate">Dată final</string>
     <string name="startDate">Dată început</string>
     <string name="details">Detalii</string>
-    <string name="add_car">Adaugă mașină</string>
+    <string name="add_car">Adaugă mașina</string>
     <string name="add_images">Adaugă fotografii</string>
     <string name="car_brand">Marcă autovehicul</string>
     <string name="choose_car_brand">Alege marca auto</string>
@@ -79,4 +79,9 @@
     <string name="best_car_of_the_show">Best Car of The Show</string>
     <string name="noLikes">0</string>
     <string name="event_location">Locație eveniment</string>
+    <string name="car_model_example">ex: A45 AMG</string>
+    <string name="car_brand_example">ex: Mercedes-Benz</string>
+    <string name="location_example">ex: Snagov Plaza</string>
+    <string name="car_mods_applied">Modificări aduse mașinii</string>
+    <string name="my_garage">Garajul meu</string>
 </resources>

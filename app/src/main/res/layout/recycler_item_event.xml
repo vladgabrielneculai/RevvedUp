@@ -23,7 +23,7 @@
             android:layout_gravity="start"
             android:layout_margin="10dp"
             android:contentDescription="@string/event_name"
-            android:src="@drawable/revvedup_logo" />
+            android:src="@drawable/empty_image" />
 
         <LinearLayout
             android:layout_width="wrap_content"

@@ -14,8 +14,8 @@
         android:icon="@drawable/baseline_add_24"/>
     <item
         android:id="@+id/my_car"
-        android:title="@string/mycar"
-        android:icon="@drawable/baseline_car_24"/>
+        android:icon="@drawable/baseline_car_24"
+        android:title="@string/my_garage" />
     <item
         android:id="@+id/more"
         android:title="@string/more"
