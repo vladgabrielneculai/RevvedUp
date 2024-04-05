@@ -53,9 +53,9 @@ public class AddEventActivity extends AppCompatActivity implements OnMapReadyCal
     DatabaseReference eventsRef, usersRef, carsRef;
     ImageView profileImageView;
     Uri selectedImageUri;
-    EditText eventName, eventDetails, eventLocation;
+    EditText eventName, eventDetails;
     TextView eventStartDate, eventEndDate;
-    Button pickStartDate, pickEndDate, back, addEvent, pickImage, searchLocation;
+    Button pickStartDate, pickEndDate, back, addEvent, pickImage;
     CheckBox limbo, bestCar, loudestPipe, exhaust, performanceMods, bodykit, coilovers, rims;
 
     List<String> modsAllowed, eventCompetitions;
@@ -265,7 +265,7 @@ public class AddEventActivity extends AppCompatActivity implements OnMapReadyCal
             String startDate = eventStartDate.getText().toString();
             String endDate = eventEndDate.getText().toString();
             String eventOwner = user.getEmail();
-            String location = eventLocation.toString();
+            String location = mapSearchView.getQuery().toString();
             int noLikes = 0;
             int noCars = 0;
 
@@ -290,12 +290,12 @@ public class AddEventActivity extends AppCompatActivity implements OnMapReadyCal
                                 finish();
                             }).addOnFailureListener(exception -> {
                                 // Handle any errors that occurred during the process of getting the download URL
-                                Toast.makeText(AddEventActivity.this, "Error uploading image: " + exception.getMessage(), Toast.LENGTH_SHORT).show();
+                                Toast.makeText(AddEventActivity.this, "S-a produs o eroare la încărcarea imaginii. Vă rugăm reîncercați!", Toast.LENGTH_SHORT).show();
                             });
                         })
                         .addOnFailureListener(exception -> {
                             // Handle any errors that occurred during the upload process
-                            Toast.makeText(AddEventActivity.this, "Error uploading image: " + exception.getMessage(), Toast.LENGTH_SHORT).show();
+                            Toast.makeText(AddEventActivity.this, "S-a produs o eroare la încărcarea imaginii. Vă rugăm reîncercați!", Toast.LENGTH_SHORT).show();
                         });
             } else {
                 // If no image is selected, proceed with adding the event to the database without an image
