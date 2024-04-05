@@ -5,12 +5,13 @@ import android.location.Address;
 import android.location.Geocoder;
 import android.net.Uri;
 import android.os.Bundle;
-import android.text.Editable;
-import android.text.TextWatcher;
+import android.widget.ArrayAdapter;
+import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.SearchView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -21,8 +22,8 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.firebase.auth.FirebaseAuth;
@@ -32,6 +33,8 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -40,12 +43,7 @@ import java.util.List;
 
 public class AddEventActivity extends AppCompatActivity implements OnMapReadyCallback {
 
-    private static final int IMAGE_PICK_CODE = 100;  // Request code for image selection
-
     //  TODO: Create the functionality so that the event admin can add the location of the event (it's better to add the location as an address than to choose the point from the map imo)
-
-    GoogleMap mMap;
-    MapView mMapView;
 
     FirebaseDatabase database;
     FirebaseAuth mAuth;
@@ -57,23 +55,25 @@ public class AddEventActivity extends AppCompatActivity implements OnMapReadyCal
     Uri selectedImageUri;
     EditText eventName, eventDetails, eventLocation;
     TextView eventStartDate, eventEndDate;
-    Button pickStartDate, pickEndDate, back, addEvent, pickImage;
+    Button pickStartDate, pickEndDate, back, addEvent, pickImage, searchLocation;
     CheckBox limbo, bestCar, loudestPipe, exhaust, performanceMods, bodykit, coilovers, rims;
 
     List<String> modsAllowed, eventCompetitions;
+    ArrayAdapter<String> adapterEventType;
+    AutoCompleteTextView autoCompleteTextView;
+    GoogleMap myMap;
+    SearchView mapSearchView;
+
+
+    String[] event = {"Meet", "Expoziție"};
 
     private final ActivityResultLauncher<String> imagePickerLauncher = registerForActivityResult(new ActivityResultContracts.GetContent(),
             new ActivityResultCallback<Uri>() {
                 @Override
                 public void onActivityResult(Uri uri) {
                     if (uri != null) {
-                        // Image is selected successfully, use the URI
                         selectedImageUri = uri;
                         profileImageView.setImageURI(uri);
-                    } else {
-                        // If the URI is null, the user canceled the image selection, handle it accordingly
-                        // For example, you might want to show a message to the user
-                        Toast.makeText(AddEventActivity.this, "Image selection canceled", Toast.LENGTH_SHORT).show();
                     }
                 }
             });
@@ -109,7 +109,6 @@ public class AddEventActivity extends AppCompatActivity implements OnMapReadyCal
         eventEndDate = findViewById(R.id.eventEndDate);
         pickStartDate = findViewById(R.id.pickStartDate);
         pickEndDate = findViewById(R.id.pickEndDate);
-        eventLocation = findViewById(R.id.location_address);
         pickImage = findViewById(R.id.pickImage);
         profileImageView = findViewById(R.id.profileImageView);
         back = findViewById(R.id.back);
@@ -122,49 +121,21 @@ public class AddEventActivity extends AppCompatActivity implements OnMapReadyCal
         limbo = findViewById(R.id.limbo);
         loudestPipe = findViewById(R.id.loudest_pipe);
         bestCar = findViewById(R.id.best_car);
-        mMapView = findViewById(R.id.location_map);
+        autoCompleteTextView = findViewById(R.id.autoComplete_eventtype);
+        mapSearchView = findViewById(R.id.location_address);
 
-        mMapView.onCreate(savedInstanceState);
-        mMapView.getMapAsync(this);
 
         //Initialize the lists
         modsAllowed = new ArrayList<>();
         eventCompetitions = new ArrayList<>();
 
+        adapterEventType = new ArrayAdapter<String>(this, R.layout.event_type, event);
+        autoCompleteTextView.setAdapter(adapterEventType);
+
         //Logic for logo selection
         pickImage.setOnClickListener(v -> {
             // Launch the image picker activity
             imagePickerLauncher.launch("image/*");
-        });
-
-        eventLocation.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-            }
-
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-                String location = s.toString();
-                if (!location.isEmpty()) {
-                    Geocoder geocoder = new Geocoder(AddEventActivity.this);
-                    try {
-                        List<Address> addresses = geocoder.getFromLocationName(location, 1);
-                        if (!addresses.isEmpty()) {
-                            Address address = addresses.get(0);
-                            LatLng latLng = new LatLng(address.getLatitude(), address.getLongitude());
-                            mMap.clear(); // Clear existing markers
-                            mMap.addMarker(new MarkerOptions().position(latLng).title(location));
-                            mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 15));
-                        }
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                }
-            }
-
-            @Override
-            public void afterTextChanged(Editable s) {
-            }
         });
 
 
@@ -247,6 +218,46 @@ public class AddEventActivity extends AppCompatActivity implements OnMapReadyCal
             datePickerDialog.show();
         });
 
+        //Map logic
+        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.location_map);
+        mapFragment.getMapAsync(AddEventActivity.this);
+
+        mapSearchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+
+                String location = mapSearchView.getQuery().toString();
+                List<Address> addressList;
+
+                if (location != null) {
+                    Geocoder geocoder = new Geocoder(AddEventActivity.this);
+
+                    try {
+                        addressList = geocoder.getFromLocationName(location, 1);
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
+
+                    Address address = addressList.get(0);
+                    LatLng latLng = new LatLng(address.getLatitude(), address.getLongitude());
+                    myMap.addMarker(new MarkerOptions().position(latLng).title(location));
+                    myMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 15));
+                }
+
+                return false;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+
+
+                return false;
+            }
+        });
+
+        mapFragment.getMapAsync(AddEventActivity.this);
+
+
         //Button used to create an event and add it to the database
         addEvent.setOnClickListener(v -> {
             String name = eventName.getText().toString();
@@ -260,7 +271,7 @@ public class AddEventActivity extends AppCompatActivity implements OnMapReadyCal
 
             if (selectedImageUri != null) {
                 // Get the filename from the event name
-                String filename = name.replace(" ", "_") + ".jpg"; // Assuming the image format is JPEG
+                String filename = name.toLowerCase().replace(" ", "_") + ".jpg"; // Assuming the image format is JPEG
 
                 // Get a reference to the Firebase Storage location where the image will be stored
                 StorageReference imageRef = storageRef.child("event_images/" + filename);
@@ -313,18 +324,8 @@ public class AddEventActivity extends AppCompatActivity implements OnMapReadyCal
     }
 
     @Override
-    public void onMapReady(GoogleMap googleMap) {
-        mMap = googleMap;
-
-        // Enable zoom controls
-        mMap.getUiSettings().setZoomControlsEnabled(true);
-
-        // Set a default location (e.g., city center)
-        LatLng defaultLocation = new LatLng(40.7128, -74.0060);
-        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(defaultLocation, 10));
-
-        // Add marker at the default location
-        mMap.addMarker(new MarkerOptions().position(defaultLocation).title("Marker in City Center"));
+    public void onMapReady(@NotNull GoogleMap googleMap) {
+        myMap = googleMap;
     }
 
 

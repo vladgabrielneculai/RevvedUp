@@ -13,6 +13,7 @@ import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.bumptech.glide.Glide;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -27,13 +28,8 @@ import java.util.Objects;
 
 public class ModifyProfile extends AppCompatActivity {
 
-    private static final int IMAGE_PICK_CODE = 100;  // Request code for image selection
-
     FirebaseAuth mAuth;
     FirebaseUser user;
-    FirebaseStorage storage;
-    StorageReference storageRef;
-    DatabaseReference usersRef;
 
     Button backButton, modifyButton, selectProfileImage;
     ImageView profileImageView;
@@ -114,7 +110,7 @@ public class ModifyProfile extends AppCompatActivity {
     }
 
     private void populateUserData(FirebaseUser user) {
-        DatabaseReference userRef = FirebaseDatabase.getInstance().getReference("utilizatori");
+        DatabaseReference userRef = FirebaseDatabase.getInstance().getReference("users");
         userRef.orderByChild("uid").equalTo(user.getUid()).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
@@ -125,6 +121,8 @@ public class ModifyProfile extends AppCompatActivity {
                         String emailaddr = userSnapshot.child("email").getValue(String.class);
                         String uname = userSnapshot.child("username").getValue(String.class);
                         String pass = userSnapshot.child("password").getValue(String.class);
+                        String profileImageUrl = userSnapshot.child("imagePath").getValue(String.class);
+
 
                         firstName.setText(fName);
                         lastName.setText(lName);
@@ -132,6 +130,12 @@ public class ModifyProfile extends AppCompatActivity {
                         username.setText(uname);
                         password.setText(pass);
                         cpassword.setText(pass);
+
+                        // Load the profile image if available
+                        if (profileImageUrl != null && !profileImageUrl.isEmpty()) {
+                            // Use Glide or Picasso library to load the image into ImageView
+                            Glide.with(ModifyProfile.this).load(profileImageUrl).into(profileImageView);
+                        }
                     }
                 }
             }
@@ -149,7 +153,7 @@ public class ModifyProfile extends AppCompatActivity {
         String newUsername = username.getText().toString();
         String newPassword = password.getText().toString();
 
-        DatabaseReference userRef = FirebaseDatabase.getInstance().getReference("utilizatori");
+        DatabaseReference userRef = FirebaseDatabase.getInstance().getReference("users");
 
         userRef.orderByChild("uid").equalTo(user.getUid()).addListenerForSingleValueEvent(new ValueEventListener() {
 
@@ -170,7 +174,7 @@ public class ModifyProfile extends AppCompatActivity {
                             StorageReference storageReference = FirebaseStorage.getInstance().getReference();
 
                             // Create a reference to the user's specific subfolder
-                            StorageReference userImageRef = storageReference.child("profile_images/" + user.getUid() + "/");
+                            StorageReference userImageRef = storageReference.child("profile_images/" + userSnapshot.child("username").getValue(String.class) + "/");
 
                             // Upload the image with the userImageRef
                             userImageRef.putFile(selectedImageUri)

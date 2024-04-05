@@ -84,4 +84,8 @@
     <string name="location_example">ex: Snagov Plaza</string>
     <string name="car_mods_applied">Modificări aduse mașinii</string>
     <string name="my_garage">Garajul meu</string>
+    <string name="search_location">Caută locația</string>
+    <string name="event_type">Tipul de eveniment</string>
+    <string name="choose_event_type">Alege tipul evenimentului</string>
+    <string name="title_activity_maps">MapsActivity</string>
 </resources>

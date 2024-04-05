@@ -1,6 +1,6 @@
 package com.vgn.revvedup;
 
-import android.media.Image;
+import android.net.Uri;
 import android.os.Bundle;
 import android.widget.Button;
 import android.widget.CheckBox;
@@ -14,6 +14,7 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,12 +28,14 @@ public class AddCarActivity extends AppCompatActivity {
     FirebaseUser user;
     FirebaseStorage storage;
     DatabaseReference carsRef, usersRef;
+    StorageReference storageRef;
     ImageView profileImageView1, profileImageView2, profileImageView3, profileImageView4, profileImageView5, profileImageView6;
-    Button back, addCar;
+    Button back, addCar, addCarImages;
     EditText carBrand, carModel, carRegistrationNumber;
     CheckBox exhaust, performanceMods, bodykit, coilovers, rims;
     List<String> modsApplied;
-    List<Image> carPictures;
+    List<Uri> carPicturesUri;
+
 
 
     @Override
@@ -62,6 +65,7 @@ public class AddCarActivity extends AppCompatActivity {
         rims = findViewById(R.id.rims);
         back = findViewById(R.id.back);
         addCar = findViewById(R.id.addCar);
+        addCarImages = findViewById(R.id.addCarImages);
         profileImageView1 = findViewById(R.id.profileImageView1);
         profileImageView2 = findViewById(R.id.profileImageView2);
         profileImageView3 = findViewById(R.id.profileImageView3);
@@ -70,8 +74,14 @@ public class AddCarActivity extends AppCompatActivity {
         profileImageView6 = findViewById(R.id.profileImageView6);
 
         //Initialize the lists
-        carPictures = new ArrayList<>();
         modsApplied = new ArrayList<>();
+        carPicturesUri = new ArrayList<>();
+
+        addCarImages.setOnClickListener(v -> {
+            //Launch the image picker activity
+            //imagePickerLauncher.launch("image/*");
+        });
+
 
         //Mods logic
         exhaust.setOnCheckedChangeListener((buttonView, isChecked) -> {
@@ -110,7 +120,7 @@ public class AddCarActivity extends AppCompatActivity {
             String car_registration = carRegistrationNumber.getText().toString();
             String car_owner = user.getEmail();
 
-            Car car = new Car(car_brand, car_model, car_registration, car_owner);
+            Car car = new Car(car_brand, car_model, car_registration, car_owner, carPicturesUri, modsApplied);
             carsRef.child(car_registration).setValue(car);
 
             finish();
@@ -124,5 +134,6 @@ public class AddCarActivity extends AppCompatActivity {
         if (!modsApplied.contains(modText)) {
             modsApplied.add(modText);
         }
+
     }
 }
