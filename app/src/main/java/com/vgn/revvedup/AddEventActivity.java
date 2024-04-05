@@ -1,5 +1,6 @@
 package com.vgn.revvedup;
 
+import android.annotation.SuppressLint;
 import android.app.DatePickerDialog;
 import android.location.Address;
 import android.location.Geocoder;
@@ -39,34 +40,36 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
+import java.util.Objects;
 
 
 public class AddEventActivity extends AppCompatActivity implements OnMapReadyCallback {
 
-    //  TODO: Create the functionality so that the event admin can add the location of the event (it's better to add the location as an address than to choose the point from the map imo)
-
+    //Database & Storage
     FirebaseDatabase database;
     FirebaseAuth mAuth;
     FirebaseUser user;
     FirebaseStorage storage;
     StorageReference storageRef;
     DatabaseReference eventsRef, usersRef, carsRef;
+
+    //XML Components
     ImageView profileImageView;
     Uri selectedImageUri;
     EditText eventName, eventDetails;
     TextView eventStartDate, eventEndDate;
     Button pickStartDate, pickEndDate, back, addEvent, pickImage;
     CheckBox limbo, bestCar, loudestPipe, exhaust, performanceMods, bodykit, coilovers, rims;
-
-    List<String> modsAllowed, eventCompetitions;
-    ArrayAdapter<String> adapterEventType;
     AutoCompleteTextView autoCompleteTextView;
     GoogleMap myMap;
     SearchView mapSearchView;
 
-
+    //Lists and Adapters
+    List<String> modsAllowed, eventCompetitions;
+    ArrayAdapter<String> adapterEventType;
     String[] event = {"Meet", "Expoziție"};
 
+    //Image Selection Logic
     private final ActivityResultLauncher<String> imagePickerLauncher = registerForActivityResult(new ActivityResultContracts.GetContent(),
             new ActivityResultCallback<Uri>() {
                 @Override
@@ -78,7 +81,7 @@ public class AddEventActivity extends AppCompatActivity implements OnMapReadyCal
                 }
             });
 
-
+    //Main Layout
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -103,36 +106,50 @@ public class AddEventActivity extends AppCompatActivity implements OnMapReadyCal
         storageRef = storage.getReference();
 
         //Declaration of XML Layout components
+
+        //Image
+        profileImageView = findViewById(R.id.profileImageView);
+        pickImage = findViewById(R.id.pickImage);
+
+        //Event details (name, description,etc.)
         eventName = findViewById(R.id.eventName);
         eventDetails = findViewById(R.id.eventDetails);
-        eventStartDate = findViewById(R.id.eventStartDate);
-        eventEndDate = findViewById(R.id.eventEndDate);
-        pickStartDate = findViewById(R.id.pickStartDate);
-        pickEndDate = findViewById(R.id.pickEndDate);
-        pickImage = findViewById(R.id.pickImage);
-        profileImageView = findViewById(R.id.profileImageView);
-        back = findViewById(R.id.back);
-        addEvent = findViewById(R.id.addEvent);
+        autoCompleteTextView = findViewById(R.id.autoComplete_eventtype);
+
+        //Mods
         exhaust = findViewById(R.id.exhaust);
         coilovers = findViewById(R.id.coilovers);
         rims = findViewById(R.id.rims);
         bodykit = findViewById(R.id.bodykit);
         performanceMods = findViewById(R.id.performance_mods);
+
+        //Competitions
         limbo = findViewById(R.id.limbo);
         loudestPipe = findViewById(R.id.loudest_pipe);
         bestCar = findViewById(R.id.best_car);
-        autoCompleteTextView = findViewById(R.id.autoComplete_eventtype);
+
+        //Date of event
+        eventStartDate = findViewById(R.id.eventStartDate);
+        eventEndDate = findViewById(R.id.eventEndDate);
+        pickStartDate = findViewById(R.id.pickStartDate);
+        pickEndDate = findViewById(R.id.pickEndDate);
+
+        //Map
         mapSearchView = findViewById(R.id.location_address);
 
+        //Buttons
+        back = findViewById(R.id.back);
+        addEvent = findViewById(R.id.addEvent);
 
         //Initialize the lists
         modsAllowed = new ArrayList<>();
         eventCompetitions = new ArrayList<>();
 
-        adapterEventType = new ArrayAdapter<String>(this, R.layout.event_type, event);
+        //Type of event selection
+        adapterEventType = new ArrayAdapter<>(this, R.layout.event_type, event);
         autoCompleteTextView.setAdapter(adapterEventType);
 
-        //Logic for logo selection
+        //Logo selection
         pickImage.setOnClickListener(v -> {
             // Launch the image picker activity
             imagePickerLauncher.launch("image/*");
@@ -196,7 +213,7 @@ public class AddEventActivity extends AppCompatActivity implements OnMapReadyCal
             int month = calendar.get(Calendar.MONTH);
             int day = calendar.get(Calendar.DAY_OF_MONTH);
 
-            DatePickerDialog datePickerDialog = new DatePickerDialog(AddEventActivity.this,
+            @SuppressLint("DefaultLocale") DatePickerDialog datePickerDialog = new DatePickerDialog(AddEventActivity.this,
                     (view, year1, monthOfYear, dayOfMonth) -> {
                         // Update event date text
                         eventStartDate.setText(String.format("%d/%d/%d", dayOfMonth, monthOfYear + 1, year1));
@@ -210,7 +227,7 @@ public class AddEventActivity extends AppCompatActivity implements OnMapReadyCal
             int month = calendar.get(Calendar.MONTH);
             int day = calendar.get(Calendar.DAY_OF_MONTH);
 
-            DatePickerDialog datePickerDialog = new DatePickerDialog(AddEventActivity.this,
+            @SuppressLint("DefaultLocale") DatePickerDialog datePickerDialog = new DatePickerDialog(AddEventActivity.this,
                     (view, year1, monthOfYear, dayOfMonth) -> {
                         // Update event date text
                         eventEndDate.setText(String.format("%d/%d/%d", dayOfMonth, monthOfYear + 1, year1));
@@ -220,7 +237,7 @@ public class AddEventActivity extends AppCompatActivity implements OnMapReadyCal
 
         //Map logic
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.location_map);
-        mapFragment.getMapAsync(AddEventActivity.this);
+        Objects.requireNonNull(mapFragment).getMapAsync(AddEventActivity.this);
 
         mapSearchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
@@ -229,20 +246,18 @@ public class AddEventActivity extends AppCompatActivity implements OnMapReadyCal
                 String location = mapSearchView.getQuery().toString();
                 List<Address> addressList;
 
-                if (location != null) {
-                    Geocoder geocoder = new Geocoder(AddEventActivity.this);
+                Geocoder geocoder = new Geocoder(AddEventActivity.this);
 
-                    try {
-                        addressList = geocoder.getFromLocationName(location, 1);
-                    } catch (IOException e) {
-                        throw new RuntimeException(e);
-                    }
-
-                    Address address = addressList.get(0);
-                    LatLng latLng = new LatLng(address.getLatitude(), address.getLongitude());
-                    myMap.addMarker(new MarkerOptions().position(latLng).title(location));
-                    myMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 15));
+                try {
+                    addressList = geocoder.getFromLocationName(location, 1);
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
                 }
+
+                Address address = Objects.requireNonNull(addressList).get(0);
+                LatLng latLng = new LatLng(address.getLatitude(), address.getLongitude());
+                myMap.addMarker(new MarkerOptions().position(latLng).title(location));
+                myMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 15));
 
                 return false;
             }
@@ -266,6 +281,7 @@ public class AddEventActivity extends AppCompatActivity implements OnMapReadyCal
             String endDate = eventEndDate.getText().toString();
             String eventOwner = user.getEmail();
             String location = mapSearchView.getQuery().toString();
+            String eventType = autoCompleteTextView.getText().toString();
             int noLikes = 0;
             int noCars = 0;
 
@@ -284,7 +300,7 @@ public class AddEventActivity extends AppCompatActivity implements OnMapReadyCal
                             imageRef.getDownloadUrl().addOnSuccessListener(uri -> {
                                 // Save the download URL to the event object or store it wherever needed
                                 String eventImage = uri.toString();
-                                Event event = new Event(name, details, startDate, endDate, location, eventImage, eventOwner, modsAllowed, eventCompetitions, noLikes, noCars);
+                                Event event = new Event(name, details, startDate, endDate, location, eventType, eventImage, eventOwner, modsAllowed, eventCompetitions, noLikes, noCars);
                                 // Proceed with adding the event to the database
                                 eventsRef.child(name).setValue(event);
                                 finish();
@@ -300,7 +316,7 @@ public class AddEventActivity extends AppCompatActivity implements OnMapReadyCal
             } else {
                 // If no image is selected, proceed with adding the event to the database without an image
                 String eventImage = "";
-                Event event = new Event(name, details, startDate, endDate, location, eventImage, eventOwner, modsAllowed, eventCompetitions, noLikes, noCars);
+                Event event = new Event(name, details, startDate, endDate, location, eventType, eventImage, eventOwner, modsAllowed, eventCompetitions, noLikes, noCars);
                 eventsRef.child(name).setValue(event);
                 finish();
             }
