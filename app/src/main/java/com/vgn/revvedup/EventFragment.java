@@ -1,5 +1,6 @@
 package com.vgn.revvedup;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -59,6 +60,16 @@ public class EventFragment extends Fragment {
             public boolean onQueryTextChange(String newText) {
                 fetchEvents(newText);
                 return false;
+            }
+        });
+
+        adapter.setOnItemClickListener(new EventAdapter.OnItemClickListener() {
+            @Override
+            public void onItemClick(Event event) {
+                // Deschideți EventDetailsActivity și trimiteți detalii despre eveniment
+                Intent intent = new Intent(getActivity(), EventDetails.class);
+                intent.putExtra("name", event.getName());
+                startActivity(intent);
             }
         });
 

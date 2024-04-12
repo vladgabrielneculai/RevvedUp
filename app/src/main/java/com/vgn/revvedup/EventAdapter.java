@@ -3,6 +3,7 @@ package com.vgn.revvedup;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -15,16 +16,25 @@ import java.util.List;
 
 public class EventAdapter extends RecyclerView.Adapter<EventAdapter.UserViewHolder> {
 
-    private final List<Event> events;
+    private static List<Event> events = null;
+    private static OnItemClickListener itemClickListener;
 
     public EventAdapter(List<Event> events) {
-        this.events = events;
+        EventAdapter.events = events;
+    }
+
+    public interface OnItemClickListener {
+        void onItemClick(Event event);
+    }
+
+    public void setOnItemClickListener(OnItemClickListener listener) {
+        itemClickListener = listener;
     }
 
     @NonNull
     @Override
     public UserViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.recycler_item_event, parent, false);
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.recycler_item_event_admin, parent, false);
         return new UserViewHolder(view);
     }
 
@@ -52,12 +62,21 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.UserViewHold
         private final TextView eventTextView;
         private final TextView eventDateTextView;
         private final ImageView eventImageView;
+        private final Button viewDetails;
 
         public UserViewHolder(@NonNull View itemView) {
             super(itemView);
             eventTextView = itemView.findViewById(R.id.eventTextView);
             eventDateTextView = itemView.findViewById(R.id.eventDateTextView);
             eventImageView = itemView.findViewById(R.id.img);
+            viewDetails = itemView.findViewById(R.id.viewDetails);
+
+            viewDetails.setOnClickListener(v->{
+                int position = getAdapterPosition();
+                if(position != RecyclerView.NO_POSITION && itemClickListener != null){
+                    itemClickListener.onItemClick(events.get(position));
+                }
+            });
         }
     }
 }

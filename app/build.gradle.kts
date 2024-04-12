@@ -51,12 +51,15 @@ dependencies {
     implementation("com.google.android.gms:play-services-places:17.0.0")
     implementation("com.google.firebase:firebase-storage:20.3.0")
     implementation("androidx.cardview:cardview:1.0.0")
-    implementation("com.github.bumptech.glide:glide:4.12.0")
     implementation("com.google.android.gms:play-services-maps:18.2.0")
     implementation("com.google.android.engage:engage-core:1.4.0")
+    implementation("androidx.activity:activity:1.8.2")
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.1.5")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
-    annotationProcessor("com.github.bumptech.glide:compiler:4.12.0")
 
+    implementation("com.github.bumptech.glide:glide:4.12.0")
+    implementation("com.github.denzcoskun:ImageSlideshow:0.1.0")
+    implementation("com.github.PhilJay:MPAndroidChart:v3.1.0")
+    annotationProcessor("com.github.bumptech.glide:compiler:4.16.0")
 }

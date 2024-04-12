@@ -22,12 +22,15 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.RevvedUp"
         tools:targetApi="s">
-
-
-        <meta-data
-            android:name="com.google.android.geo.API_KEY"
-            android:value="AIzaSyAs16w3ip7qiJNRKrRKB521lczv4R_QDq4" />
-
+        <activity
+            android:name=".RegisterCarInEvent"
+            android:exported="false" />
+        <activity
+            android:name=".CarDetails"
+            android:exported="false" />
+        <activity
+            android:name=".EventDetails"
+            android:exported="false" />
         <activity
             android:name=".AddCarActivity"
             android:exported="false" />
@@ -55,6 +58,10 @@
         <activity
             android:name=".MainActivity"
             android:exported="false" />
+
+        <meta-data
+            android:name="com.google.android.geo.API_KEY"
+            android:value="AIzaSyAs16w3ip7qiJNRKrRKB521lczv4R_QDq4" />
     </application>
 
 </manifest>

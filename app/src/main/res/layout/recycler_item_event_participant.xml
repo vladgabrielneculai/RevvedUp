@@ -21,7 +21,8 @@
             android:layout_width="150dp"
             android:layout_height="150dp"
             android:layout_gravity="start"
-            android:layout_margin="20dp"
+            android:layout_marginVertical="30dp"
+            android:layout_marginHorizontal="15dp"
             android:contentDescription="@string/event_name"
             android:src="@drawable/empty_image" />
 
@@ -30,7 +31,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="end"
             android:layout_marginEnd="20dp"
-            android:layout_marginTop="10dp"
+
             android:layout_marginBottom="10dp"
             android:orientation="vertical">
 

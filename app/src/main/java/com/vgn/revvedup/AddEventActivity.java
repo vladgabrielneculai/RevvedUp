@@ -282,6 +282,11 @@ public class AddEventActivity extends AppCompatActivity implements OnMapReadyCal
             String eventOwner = user.getEmail();
             String location = mapSearchView.getQuery().toString();
             String eventType = autoCompleteTextView.getText().toString();
+            LatLng latLng = getLatLngFromAddress(location);
+
+            double latitude = Objects.requireNonNull(latLng).latitude;
+            double longitude = Objects.requireNonNull(latLng).longitude;
+
             int noLikes = 0;
             int noCars = 0;
 
@@ -289,7 +294,7 @@ public class AddEventActivity extends AppCompatActivity implements OnMapReadyCal
                 // Get the filename from the event name
                 String filename = name.toLowerCase().replace(" ", "_") + ".jpg"; // Assuming the image format is JPEG
 
-                // Get a reference to the Firebase Storage location where the image will be stored
+                // Get a reference to the Firebase Storae location where the image will be stored
                 StorageReference imageRef = storageRef.child("event_images/" + filename);
 
                 // Upload the image to Firebase Storage
@@ -300,7 +305,7 @@ public class AddEventActivity extends AppCompatActivity implements OnMapReadyCal
                             imageRef.getDownloadUrl().addOnSuccessListener(uri -> {
                                 // Save the download URL to the event object or store it wherever needed
                                 String eventImage = uri.toString();
-                                Event event = new Event(name, details, startDate, endDate, location, eventType, eventImage, eventOwner, modsAllowed, eventCompetitions, noLikes, noCars);
+                                Event event = new Event(name, details, startDate, endDate, location, latitude, longitude, eventType, eventImage, eventOwner, modsAllowed, eventCompetitions, noLikes, noCars);
                                 // Proceed with adding the event to the database
                                 eventsRef.child(name).setValue(event);
                                 finish();
@@ -316,7 +321,7 @@ public class AddEventActivity extends AppCompatActivity implements OnMapReadyCal
             } else {
                 // If no image is selected, proceed with adding the event to the database without an image
                 String eventImage = "";
-                Event event = new Event(name, details, startDate, endDate, location, eventType, eventImage, eventOwner, modsAllowed, eventCompetitions, noLikes, noCars);
+                Event event = new Event(name, details, startDate, endDate, location, latitude, longitude, eventType, eventImage, eventOwner, modsAllowed, eventCompetitions, noLikes, noCars);
                 eventsRef.child(name).setValue(event);
                 finish();
             }
@@ -344,5 +349,18 @@ public class AddEventActivity extends AppCompatActivity implements OnMapReadyCal
         myMap = googleMap;
     }
 
+    private LatLng getLatLngFromAddress(String address) {
+        Geocoder geocoder = new Geocoder(AddEventActivity.this);
+        try {
+            List<Address> addressList = geocoder.getFromLocationName(address, 1);
+            if (addressList != null && !addressList.isEmpty()) {
+                Address addr = addressList.get(0);
+                return new LatLng(addr.getLatitude(), addr.getLongitude());
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
 
 }

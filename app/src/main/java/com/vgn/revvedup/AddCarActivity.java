@@ -6,7 +6,11 @@ import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.Toast;
 
+import androidx.activity.result.ActivityResultCallback;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.firebase.auth.FirebaseAuth;
@@ -18,16 +22,16 @@ import com.google.firebase.storage.StorageReference;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class AddCarActivity extends AppCompatActivity {
-
-    // TODO: Create a functionality so that the user can add images with his car into the Cloud Firebase and then it saves the reference to the Firebase Realtime Database.
 
     FirebaseDatabase database;
     FirebaseAuth mAuth;
     FirebaseUser user;
     FirebaseStorage storage;
-    DatabaseReference carsRef, usersRef;
+    DatabaseReference carsRef;
     StorageReference storageRef;
     ImageView profileImageView1, profileImageView2, profileImageView3, profileImageView4, profileImageView5, profileImageView6;
     Button back, addCar, addCarImages;
@@ -36,25 +40,53 @@ public class AddCarActivity extends AppCompatActivity {
     List<String> modsApplied;
     List<Uri> carPicturesUri;
 
+    private final ActivityResultLauncher<String> imagePickerLauncher = registerForActivityResult(new ActivityResultContracts.GetMultipleContents(),
+            new ActivityResultCallback<List<Uri>>() {
+                @Override
+                public void onActivityResult(List<Uri> uris) {
+                    if (uris != null && !uris.isEmpty()) {
+                        selectedImageUris.addAll(uris);
 
+                        for (int i = 0; i < Math.min(selectedImageUris.size(), profileImageViews.size()); i++) {
+                            setImageUriForImageView(selectedImageUris.get(i), profileImageViews.get(i));
+                        }
+                    }
+                }
+            });
+
+    private final List<Uri> selectedImageUris = new ArrayList<>();
+    private List<ImageView> profileImageViews;
+
+    private void initializeProfileImageViews() {
+        profileImageViews = new ArrayList<>();
+        profileImageViews.add(profileImageView1);
+        profileImageViews.add(profileImageView2);
+        profileImageViews.add(profileImageView3);
+        profileImageViews.add(profileImageView4);
+        profileImageViews.add(profileImageView5);
+        profileImageViews.add(profileImageView6);
+    }
+
+    private void setImageUriForImageView(Uri uri, ImageView imageView) {
+        if (imageView != null) {
+            imageView.setImageURI(uri);
+        }
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_car);
 
-        //Firebase instances
         database = FirebaseDatabase.getInstance();
         mAuth = FirebaseAuth.getInstance();
         user = mAuth.getCurrentUser();
 
-        //Access to "users" database
-        usersRef = database.getReference("users");
-
-        //Access to "cars" database
         carsRef = database.getReference("cars");
 
-        //Declaration of XML Layout components
+        storage = FirebaseStorage.getInstance();
+        storageRef = storage.getReference();
+
         carBrand = findViewById(R.id.carBrand);
         carModel = findViewById(R.id.carModel);
         carRegistrationNumber = findViewById(R.id.carRegistration);
@@ -73,17 +105,13 @@ public class AddCarActivity extends AppCompatActivity {
         profileImageView5 = findViewById(R.id.profileImageView5);
         profileImageView6 = findViewById(R.id.profileImageView6);
 
-        //Initialize the lists
         modsApplied = new ArrayList<>();
         carPicturesUri = new ArrayList<>();
 
-        addCarImages.setOnClickListener(v -> {
-            //Launch the image picker activity
-            //imagePickerLauncher.launch("image/*");
-        });
+        addCarImages.setOnClickListener(v -> imagePickerLauncher.launch("image/*"));
 
+        initializeProfileImageViews();
 
-        //Mods logic
         exhaust.setOnCheckedChangeListener((buttonView, isChecked) -> {
             if (isChecked) {
                 addSelectedMod(exhaust.getText().toString());
@@ -115,18 +143,43 @@ public class AddCarActivity extends AppCompatActivity {
         });
 
         addCar.setOnClickListener(v -> {
+            // Retrieve car details from EditText fields
             String car_brand = carBrand.getText().toString();
             String car_model = carModel.getText().toString();
             String car_registration = carRegistrationNumber.getText().toString();
             String car_owner = user.getEmail();
 
-            Car car = new Car(car_brand, car_model, car_registration, car_owner, carPicturesUri, modsApplied);
-            carsRef.child(car_registration).setValue(car);
+            // List to store the download URLs of uploaded images
+            List<String> imageDownloadUrls = new ArrayList<>();
+            int totalImages = selectedImageUris.size();
+            AtomicInteger imagesUploadedCount = new AtomicInteger(0);
 
-            finish();
+            // Iterate through each selected image and upload it to Firebase Storage
+            for (Uri imageUri : selectedImageUris) {
+                StorageReference imageRef = storageRef.child("car_images").child(car_registration).child(Objects.requireNonNull(imageUri.getLastPathSegment()));
+
+                // Upload the image to Firebase Storage
+                imageRef.putFile(imageUri)
+                        .addOnSuccessListener(taskSnapshot -> imageRef.getDownloadUrl().addOnSuccessListener(uri -> {
+                            imageDownloadUrls.add(uri.toString());
+
+                            // Check if all images have been uploaded
+                            if (imagesUploadedCount.incrementAndGet() == totalImages) {
+                                // All images have been uploaded, create Car object and store in Firebase Realtime Database
+                                Car car = new Car(car_brand, car_model, car_registration, car_owner, imageDownloadUrls, modsApplied);
+                                // Store the car object in the Realtime Database
+                                carsRef.child(car_registration).setValue(car);
+
+                                finish();
+                            }
+                        }))
+                        .addOnFailureListener(e -> {
+                            // Handle image upload failure
+                            Toast.makeText(AddCarActivity.this, "Failed to upload image", Toast.LENGTH_SHORT).show();
+                        });
+            }
         });
 
-        //Back button
         back.setOnClickListener(v -> finish());
     }
 
@@ -134,6 +187,5 @@ public class AddCarActivity extends AppCompatActivity {
         if (!modsApplied.contains(modText)) {
             modsApplied.add(modText);
         }
-
     }
 }

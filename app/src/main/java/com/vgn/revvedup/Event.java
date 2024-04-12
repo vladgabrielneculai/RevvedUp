@@ -7,13 +7,16 @@ public class Event {
     private String name, details, startDate, endDate, location, eventImage, eventOwner, eventType;
     private int noLikes, noCars;
     private List<String> modsAllowed, eventCompetitions;
+    private double latitude, longitude;
 
-    public Event(String name, String details, String startDate, String endDate, String location, String eventType, String eventImage, String eventOwner, List<String> modsAllowed, List<String> eventCompetitions, int noLikes, int noCars) {
+    public Event(String name, String details, String startDate, String endDate, String location,double latitude, double longitude, String eventType, String eventImage, String eventOwner, List<String> modsAllowed, List<String> eventCompetitions, int noLikes, int noCars) {
         this.name = name;
         this.details = details;
         this.startDate = startDate;
         this.endDate = endDate;
         this.location = location;
+        this.latitude = latitude;
+        this.longitude = longitude;
         this.eventType = eventType;
         this.eventImage = eventImage;
         this.eventOwner = eventOwner;
@@ -120,5 +123,21 @@ public class Event {
 
     public void setEventType(String eventType) {
         this.eventType = eventType;
+    }
+
+    public double getLatitude() {
+        return latitude;
+    }
+
+    public void setLatitude(double latitude) {
+        this.latitude = latitude;
+    }
+
+    public double getLongitude() {
+        return longitude;
+    }
+
+    public void setLongitude(double longitude) {
+        this.longitude = longitude;
     }
 }

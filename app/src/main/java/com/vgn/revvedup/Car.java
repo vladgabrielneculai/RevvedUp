@@ -1,21 +1,22 @@
 package com.vgn.revvedup;
 
-import android.net.Uri;
-
 import java.util.List;
 
 public class Car {
     String carBrand, carModel, carRegistration, carOwner;
-    List<Uri> carPicturesUri;
+    List<String> carPicturesUri;
     List<String> modsApplied;
 
-    public Car(String carBrand, String carModel, String carRegistration, String carOwner, List<Uri> carPicturesUri, List<String> modsApplied) {
+    public Car(String carBrand, String carModel, String carRegistration, String carOwner, List<String> carPicturesUri, List<String> modsApplied) {
         this.carBrand = carBrand;
         this.carModel = carModel;
         this.carRegistration = carRegistration;
         this.carOwner = carOwner;
         this.carPicturesUri = carPicturesUri;
         this.modsApplied = modsApplied;
+    }
+
+    public Car(){
     }
 
     public String getCarBrand() {
@@ -46,11 +47,11 @@ public class Car {
         return carOwner;
     }
 
-    public List<Uri> getCarPicturesUri() {
+    public List<String> getCarPicturesUri() {
         return carPicturesUri;
     }
 
-    public void setCarPicturesUri(List<Uri> carPicturesUri) {
+    public void setCarPicturesUri(List<String> carPicturesUri) {
         this.carPicturesUri = carPicturesUri;
     }
 
