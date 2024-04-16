@@ -9,9 +9,9 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
-public class AdminFragment extends Fragment {
+public class EventAdminHomeFragment extends Fragment {
 
-    public AdminFragment() {
+    public EventAdminHomeFragment() {
         // Required empty public constructor
     }
 
@@ -19,7 +19,7 @@ public class AdminFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_home_admin, container, false);
+        return inflater.inflate(R.layout.fragment_home_event_admin, container, false);
     }
 
     @Override

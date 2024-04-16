@@ -112,4 +112,6 @@
     <string name="add_car_to_event">Înscrie mașina</string>
     <string name="my_events">Evenimentele mele</string>
     <string name="registered_cars">Mașini înscrise</string>
+    <string name="no_likes">Număr aprecieri</string>
+    <string name="no_accepted_cars">Number mașini acceptate</string>
 </resources>

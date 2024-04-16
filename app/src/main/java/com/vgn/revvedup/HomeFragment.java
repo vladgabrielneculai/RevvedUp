@@ -19,13 +19,11 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import java.util.Objects;
+
 public class HomeFragment extends Fragment {
 
     private TextView usernameTextView;
-
-    private FirebaseDatabase database;
-    private FirebaseAuth mAuth;
-    private FirebaseUser user;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -34,9 +32,9 @@ public class HomeFragment extends Fragment {
 
         usernameTextView = view.findViewById(R.id.username);
 
-        database = FirebaseDatabase.getInstance();
-        mAuth = FirebaseAuth.getInstance();
-        user = mAuth.getCurrentUser();
+        FirebaseDatabase database = FirebaseDatabase.getInstance();
+        FirebaseAuth mAuth = FirebaseAuth.getInstance();
+        FirebaseUser user = mAuth.getCurrentUser();
 
         if (user != null) {
             DatabaseReference userRef = database.getReference("users");
@@ -49,7 +47,7 @@ public class HomeFragment extends Fragment {
                             usernameTextView.setText(String.format("Salut, %s!", fnameFromDb));
 
                             String role = userSnapshot.child("role").getValue(String.class);
-                            loadUserSpecificFragment(role);
+                            loadUserSpecificFragment(Objects.requireNonNull(role));
                         }
                     } else {
                         usernameTextView.setText(R.string.username);
@@ -75,15 +73,15 @@ public class HomeFragment extends Fragment {
         switch (role) {
             case "Admin":
                 // Încarcă conținut specific pentru admin în FragmentContainerView
-                fragment = new AdminFragment(); // presupunând că există un AdminFragment definit
+                fragment = new AdminHomeFragment(); // presupunând că există un AdminFragment definit
                 break;
             case "Organizator":
                 // Încarcă conținut specific pentru event admin în FragmentContainerView
-                fragment = new EventAdminFragment(); // presupunând că există un EventAdminFragment definit
+                fragment = new EventAdminHomeFragment(); // presupunând că există un EventAdminFragment definit
                 break;
             case "Participant":
                 // Încarcă conținut specific pentru participant în FragmentContainerView
-                fragment = new ParticipantFragment(); // presupunând că există un ParticipantFragment definit
+                fragment = new ParticipantHomeFragment(); // presupunând că există un ParticipantFragment definit
                 break;
         }
 
