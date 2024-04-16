@@ -16,30 +16,27 @@
         app:cardPreventCornerOverlap="true"
         app:cardUseCompatPadding="true">
 
-        <ImageView
-            android:id="@+id/img"
-            android:layout_width="150dp"
-            android:layout_height="150dp"
-            android:layout_gravity="start"
-            android:layout_marginHorizontal="15dp"
-            android:layout_marginVertical="30dp"
-            android:contentDescription="@string/car_registration_number"
-            android:src="@drawable/empty_image"
-            android:scaleType="centerCrop"/>
-
         <LinearLayout
-            android:layout_width="200dp"
+            android:layout_width="350dp"
             android:layout_height="wrap_content"
-            android:layout_gravity="end"
-            android:layout_marginHorizontal="10dp"
-            android:layout_marginBottom="10dp"
+            android:layout_gravity="center"
             android:orientation="vertical">
+
+            <ImageView
+                android:id="@+id/img"
+                android:layout_width="350dp"
+                android:layout_height="250dp"
+                android:layout_gravity="center"
+                android:contentDescription="@string/car_registration_number"
+                android:src="@drawable/empty_image"
+                android:layout_marginVertical="10dp"
+                android:scaleType="centerCrop"/>
+
 
             <TextView
                 android:id="@+id/carBrand"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="15dp"
                 android:text="@string/car_brand"
                 android:textSize="20sp"
                 android:textStyle="bold" />
@@ -62,23 +59,35 @@
                 android:textSize="16sp"
                 android:textStyle="bold" />
 
-            <Button
-                android:id="@+id/viewDetails"
-                android:layout_width="wrap_content"
+            <LinearLayout
+                android:layout_width="350dp"
                 android:layout_height="wrap_content"
-                android:text="@string/see_details"
-                android:textColor="#795548"
-                android:textStyle="bold"
-                app:cornerRadius="30dp" />
+                android:orientation="horizontal"
+                android:layout_marginVertical="10dp">
 
-            <Button
-                android:id="@+id/deleteCar"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/delete_car"
-                android:textColor="#795548"
-                android:textStyle="bold"
-                app:cornerRadius="30dp" />
+                <Button
+                    android:id="@+id/viewDetails"
+                    android:layout_width="160dp"
+                    android:layout_height="wrap_content"
+                    android:text="@string/see_details"
+                    android:textColor="#795548"
+                    android:textStyle="bold"
+                    app:cornerRadius="30dp"
+                    android:layout_marginHorizontal="10dp"/>
+
+                <Button
+                    android:id="@+id/deleteCar"
+                    android:layout_width="160dp"
+                    android:layout_height="wrap_content"
+                    android:text="@string/delete_car"
+                    android:textColor="#795548"
+                    android:textStyle="bold"
+                    app:cornerRadius="30dp"
+                    />
+
+            </LinearLayout>
+
+
 
         </LinearLayout>
 
