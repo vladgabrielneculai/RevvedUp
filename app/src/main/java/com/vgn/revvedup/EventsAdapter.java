@@ -14,17 +14,19 @@ import com.bumptech.glide.Glide;
 
 import java.util.List;
 
-public class EventAdapter extends RecyclerView.Adapter<EventAdapter.UserViewHolder> {
+public class EventsAdapter extends RecyclerView.Adapter<EventsAdapter.UserViewHolder> {
 
     private static List<Event> events = null;
     private static OnItemClickListener itemClickListener;
 
-    public EventAdapter(List<Event> events) {
-        EventAdapter.events = events;
+    public EventsAdapter(List<Event> events) {
+        EventsAdapter.events = events;
     }
 
     public interface OnItemClickListener {
-        void onItemClick(Event event);
+        void onDetailsClick(Event event);
+
+        void onDeleteClick(Event event);
     }
 
     public void setOnItemClickListener(OnItemClickListener listener) {
@@ -62,7 +64,7 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.UserViewHold
         private final TextView eventTextView;
         private final TextView eventDateTextView;
         private final ImageView eventImageView;
-        private final Button viewDetails;
+        private final Button viewDetails, deleteEvent;
 
         public UserViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -70,11 +72,19 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.UserViewHold
             eventDateTextView = itemView.findViewById(R.id.eventDateTextView);
             eventImageView = itemView.findViewById(R.id.img);
             viewDetails = itemView.findViewById(R.id.viewDetails);
+            deleteEvent = itemView.findViewById(R.id.deleteEvent);
 
-            viewDetails.setOnClickListener(v->{
+            viewDetails.setOnClickListener(v -> {
                 int position = getAdapterPosition();
-                if(position != RecyclerView.NO_POSITION && itemClickListener != null){
-                    itemClickListener.onItemClick(events.get(position));
+                if (position != RecyclerView.NO_POSITION && itemClickListener != null) {
+                    itemClickListener.onDetailsClick(events.get(position));
+                }
+            });
+
+            deleteEvent.setOnClickListener(v -> {
+                int position = getAdapterPosition();
+                if (position != RecyclerView.NO_POSITION && itemClickListener != null) {
+                    itemClickListener.onDeleteClick(events.get(position));
                 }
             });
         }

@@ -6,6 +6,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.SearchView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
@@ -25,7 +26,7 @@ public class UsersFragment extends Fragment {
 
     private FirebaseDatabase database;
     private List<User> users;
-    private UserAdapter adapter;
+    private UsersAdapter adapter;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -40,7 +41,7 @@ public class UsersFragment extends Fragment {
         RecyclerView userRecyclerView = view.findViewById(R.id.userRecyclerView);
         SearchView searchView = view.findViewById(R.id.searchView);
         userRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-        adapter = new UserAdapter(users);
+        adapter = new UsersAdapter(users);
         userRecyclerView.setAdapter(adapter);
 
         fetchUsers();
@@ -55,6 +56,23 @@ public class UsersFragment extends Fragment {
             public boolean onQueryTextChange(String newText) {
                 fetchUsers(newText);
                 return false;
+            }
+        });
+
+        adapter.setOnItemClickListener(new UsersAdapter.OnItemClickListener() {
+            @Override
+            public void onDeleteClick(User user) {
+                DatabaseReference usersRef = database.getReference("users");
+                String username = user.getUsername(); // presupunând că fiecare mașină are un cheie unic în baza de date
+
+                // Șterge mașina din baza de date
+                usersRef.child(username).removeValue().addOnSuccessListener(aVoid -> {
+                    // Ștergere reușită
+                    Toast.makeText(getActivity(), "Mașina a fost ștearsă cu succes", Toast.LENGTH_SHORT).show();
+                }).addOnFailureListener(e -> {
+                    // Întâmpinare erori în timpul ștergerii
+                    Toast.makeText(getActivity(), "Eroare la ștergerea mașinii: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                });
             }
         });
 

@@ -3,6 +3,7 @@ package com.vgn.revvedup;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -13,14 +14,22 @@ import com.bumptech.glide.Glide;
 
 import java.util.List;
 
-public class UserAdapter extends RecyclerView.Adapter<UserAdapter.UserViewHolder> {
+public class UsersAdapter extends RecyclerView.Adapter<UsersAdapter.UserViewHolder> {
 
-    private final List<User> users;
+    private static List<User> users = null;
+    private static OnItemClickListener itemClickListener;
 
-    public UserAdapter(List<User> users) {
+    public UsersAdapter(List<User> users) {
         this.users = users;
     }
 
+    public interface OnItemClickListener {
+        void onDeleteClick(User user);
+    }
+
+    public void setOnItemClickListener(OnItemClickListener listener){
+        itemClickListener = listener;
+    }
     @NonNull
     @Override
     public UserViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -52,12 +61,21 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.UserViewHolder
         private final TextView usernameTextView;
         private final TextView roleTextView;
         private final ImageView userImageView;
+        private final Button deleteUser;
 
         public UserViewHolder(@NonNull View itemView) {
             super(itemView);
             usernameTextView = itemView.findViewById(R.id.usernameTextView);
             roleTextView = itemView.findViewById(R.id.roleTextView);
             userImageView = itemView.findViewById(R.id.img);
+            deleteUser = itemView.findViewById(R.id.deleteUser);
+
+            deleteUser.setOnClickListener(v -> {
+                int position = getAdapterPosition();
+                if (position != RecyclerView.NO_POSITION && itemClickListener != null) {
+                    itemClickListener.onDeleteClick(users.get(position));
+                }
+            });
         }
     }
 }

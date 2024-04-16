@@ -78,8 +78,6 @@ public class EventDetails extends AppCompatActivity {
 
         backButton = findViewById(R.id.back);
 
-        eventName.setText(getIntent().getStringExtra("eventName"));
-
         if (user != null) {
             eventsRef.orderByChild("name").equalTo(event_name).addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override

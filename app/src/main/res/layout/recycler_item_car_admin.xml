@@ -24,15 +24,14 @@
             android:layout_marginHorizontal="15dp"
             android:layout_marginVertical="30dp"
             android:contentDescription="@string/car_registration_number"
-            android:src="@drawable/empty_image"
-            android:scaleType="centerCrop"/>
+            android:scaleType="fitCenter"
+            android:src="@drawable/empty_image" />
 
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="end"
+            android:layout_gravity="end|center"
             android:layout_marginEnd="20dp"
-            android:layout_marginBottom="10dp"
             android:orientation="vertical">
 
             <TextView
@@ -63,6 +62,7 @@
                 android:textStyle="bold" />
 
             <Button
+                android:id="@+id/viewDetails"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/see_details"
@@ -71,6 +71,7 @@
                 app:cornerRadius="30dp" />
 
             <Button
+                android:id="@+id/deleteCar"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/delete_car"

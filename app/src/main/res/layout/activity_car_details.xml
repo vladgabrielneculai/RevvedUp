@@ -16,14 +16,6 @@
             android:layout_width="match_parent"
             android:layout_height="300dp">
 
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_gravity="bottom"
-                android:layout_marginHorizontal="5dp"
-                android:text="@string/car_registration_number"
-                android:textSize="24sp" />
-
             <com.denzcoskun.imageslider.ImageSlider
                 android:id="@+id/carImageSlider"
                 android:layout_width="match_parent"
@@ -34,6 +26,16 @@
         </androidx.cardview.widget.CardView>
 
         <TextView
+            android:id="@+id/carRegistration"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom"
+            android:layout_marginHorizontal="5dp"
+            android:text="@string/car_registration_number"
+            android:textSize="24sp" />
+
+        <TextView
+            android:id="@+id/carBrand"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="5dp"
@@ -42,6 +44,7 @@
             android:textSize="22sp" />
 
         <TextView
+            android:id="@+id/carModel"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="5dp"
@@ -49,16 +52,7 @@
             android:text="@string/car_model"
             android:textSize="20sp" />
 
-        <TextView
-            android:id="@+id/eventType"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginHorizontal="5dp"
-            android:layout_marginTop="5dp"
-            android:background="@drawable/bullet"
-            android:padding="10dp"
-            android:text="@string/event_type"
-            android:textSize="14sp" />
+
 
         <Button
             android:id="@+id/back"

@@ -29,9 +29,8 @@
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="end"
+            android:layout_gravity="end|center"
             android:layout_marginEnd="20dp"
-            android:layout_marginBottom="10dp"
             android:orientation="vertical">
 
             <TextView
@@ -71,6 +70,7 @@
                 app:cornerRadius="30dp" />
 
             <Button
+                android:id="@+id/deleteEvent"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/delete_event"

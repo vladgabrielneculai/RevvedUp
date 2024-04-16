@@ -7,12 +7,12 @@
     <androidx.cardview.widget.CardView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="35dp"
-        android:layout_marginBottom="10dp"
+        android:layout_marginTop="0dp"
+        android:layout_marginBottom="0dp"
         app:cardBackgroundColor="@color/white"
         app:cardCornerRadius="20dp"
-        app:cardElevation="10dp"
-        app:cardMaxElevation="12dp"
+        app:cardElevation="5dp"
+        app:cardMaxElevation="3dp"
         app:cardPreventCornerOverlap="true"
         app:cardUseCompatPadding="true">
 
@@ -21,58 +21,61 @@
             android:layout_width="150dp"
             android:layout_height="150dp"
             android:layout_gravity="start"
-            android:layout_margin="10dp"
+            android:layout_marginHorizontal="15dp"
+            android:layout_marginVertical="30dp"
             android:contentDescription="@string/car_registration_number"
-            android:src="@drawable/empty_image" />
+            android:src="@drawable/empty_image"
+            android:scaleType="centerCrop"/>
 
         <LinearLayout
-            android:layout_width="wrap_content"
+            android:layout_width="200dp"
             android:layout_height="wrap_content"
             android:layout_gravity="end"
-            android:layout_marginEnd="20dp"
+            android:layout_marginHorizontal="10dp"
             android:layout_marginBottom="10dp"
             android:orientation="vertical">
 
             <TextView
+                android:id="@+id/carBrand"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center_horizontal"
                 android:layout_marginTop="15dp"
                 android:text="@string/car_brand"
                 android:textSize="20sp"
                 android:textStyle="bold" />
 
             <TextView
+                android:id="@+id/carModel"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center_horizontal"
+                android:layout_marginTop="5dp"
                 android:text="@string/car_model"
-                android:textSize="20sp"
+                android:textSize="16sp"
                 android:textStyle="bold" />
 
             <TextView
+                android:id="@+id/carRegistration"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center_horizontal"
+                android:layout_marginTop="5dp"
                 android:text="@string/car_registration_number"
-                android:textSize="20sp"
+                android:textSize="16sp"
                 android:textStyle="bold" />
 
             <Button
+                android:id="@+id/viewDetails"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center_horizontal"
-                android:layout_marginTop="10dp"
                 android:text="@string/see_details"
                 android:textColor="#795548"
                 android:textStyle="bold"
                 app:cornerRadius="30dp" />
 
             <Button
+                android:id="@+id/deleteCar"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center_horizontal"
-                android:text="Șterge mașină"
+                android:text="@string/delete_car"
                 android:textColor="#795548"
                 android:textStyle="bold"
                 app:cornerRadius="30dp" />

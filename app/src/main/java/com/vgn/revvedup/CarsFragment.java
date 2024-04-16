@@ -1,11 +1,13 @@
 package com.vgn.revvedup;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.SearchView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
@@ -59,6 +61,31 @@ public class CarsFragment extends Fragment {
             public boolean onQueryTextChange(String newText) {
                 fetchCars(newText);
                 return false;
+            }
+        });
+
+        adapter.setOnItemClickListener(new CarsAdapter.OnItemClickListener() {
+            @Override
+            public void onDetailsClick(Car car) {
+                    // Deschideți EventDetailsActivity și trimiteți detalii despre eveniment
+                    Intent intent = new Intent(getActivity(), CarDetails.class);
+                    intent.putExtra("carRegistration", car.getCarRegistration());
+                    startActivity(intent);
+            }
+
+            @Override
+            public void onDeleteClick(Car car){
+                DatabaseReference carsRef = database.getReference("cars");
+                String carRegistration = car.getCarRegistration(); // presupunând că fiecare mașină are un cheie unic în baza de date
+
+                // Șterge mașina din baza de date
+                carsRef.child(carRegistration).removeValue().addOnSuccessListener(aVoid -> {
+                    // Ștergere reușită
+                    Toast.makeText(getActivity(), "Mașina a fost ștearsă cu succes", Toast.LENGTH_SHORT).show();
+                }).addOnFailureListener(e -> {
+                    // Întâmpinare erori în timpul ștergerii
+                    Toast.makeText(getActivity(), "Eroare la ștergerea mașinii: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                });
             }
         });
 

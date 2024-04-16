@@ -59,7 +59,7 @@ public class MainActivity extends AppCompatActivity {
                                         if (item.getItemId() == R.id.home) {
                                             replaceFragment(new HomeFragment());
                                         } else if (item.getItemId() == R.id.event) {
-                                            replaceFragment(new EventFragment());
+                                            replaceFragment(new EventsFragment());
                                         } else if (item.getItemId() == R.id.more) {
                                             replaceFragment(new MoreFragment());
                                         } else if (item.getItemId() == R.id.cars) {
@@ -76,7 +76,7 @@ public class MainActivity extends AppCompatActivity {
                                         if (item.getItemId() == R.id.home) {
                                             replaceFragment(new HomeFragment());
                                         } else if (item.getItemId() == R.id.event) {
-                                            replaceFragment(new EventFragment());
+                                            replaceFragment(new EventsFragment());
                                         } else if (item.getItemId() == R.id.add) {
                                             Intent intent = new Intent(MainActivity.this, AddEventActivity.class);
                                             startActivity(intent);
@@ -94,7 +94,7 @@ public class MainActivity extends AppCompatActivity {
                                         if (item.getItemId() == R.id.home) {
                                             replaceFragment(new HomeFragment());
                                         } else if (item.getItemId() == R.id.event) {
-                                            replaceFragment(new EventFragment());
+                                            replaceFragment(new EventsFragment());
                                         } else if (item.getItemId() == R.id.add) {
                                             Intent intent = new Intent(MainActivity.this, AddCarActivity.class);
                                             startActivity(intent);

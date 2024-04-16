@@ -7,6 +7,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.SearchView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
@@ -22,7 +23,7 @@ import com.google.firebase.database.ValueEventListener;
 import java.util.ArrayList;
 import java.util.List;
 
-public class EventFragment extends Fragment {
+public class EventsFragment extends Fragment {
 
     // TODO: If the user is "admin": display the events from the database
     // TODO: If the user is "organizator": display his events
@@ -30,7 +31,7 @@ public class EventFragment extends Fragment {
 
     private FirebaseDatabase database;
     private List<Event> events;
-    private EventAdapter adapter;
+    private EventsAdapter adapter;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -45,7 +46,7 @@ public class EventFragment extends Fragment {
         RecyclerView eventRecyclerView = view.findViewById(R.id.eventRecyclerView);
         SearchView searchView = view.findViewById(R.id.searchView);
         eventRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-        adapter = new EventAdapter(events);
+        adapter = new EventsAdapter(events);
         eventRecyclerView.setAdapter(adapter);
 
         fetchEvents();
@@ -63,13 +64,28 @@ public class EventFragment extends Fragment {
             }
         });
 
-        adapter.setOnItemClickListener(new EventAdapter.OnItemClickListener() {
+        adapter.setOnItemClickListener(new EventsAdapter.OnItemClickListener() {
             @Override
-            public void onItemClick(Event event) {
+            public void onDetailsClick(Event event) {
                 // Deschideți EventDetailsActivity și trimiteți detalii despre eveniment
                 Intent intent = new Intent(getActivity(), EventDetails.class);
                 intent.putExtra("name", event.getName());
                 startActivity(intent);
+            }
+
+            @Override
+            public void onDeleteClick(Event event){
+                DatabaseReference carsRef = database.getReference("events");
+                String eventName = event.getName(); // presupunând că fiecare mașină are un cheie unic în baza de date
+
+                // Șterge mașina din baza de date
+                carsRef.child(eventName).removeValue().addOnSuccessListener(aVoid -> {
+                    // Ștergere reușită
+                    Toast.makeText(getActivity(), "Evenimentul a fost șters cu succes", Toast.LENGTH_SHORT).show();
+                }).addOnFailureListener(e -> {
+                    // Întâmpinare erori în timpul ștergerii
+                    Toast.makeText(getActivity(), "Eroare la ștergerea evenimentului : " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                });
             }
         });
 

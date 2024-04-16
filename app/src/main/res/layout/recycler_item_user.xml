@@ -20,25 +20,25 @@
             android:id="@+id/img"
             android:layout_width="150dp"
             android:layout_height="150dp"
-            android:layout_gravity="start"
+            android:layout_gravity="start|center"
             android:layout_marginStart="10dp"
-            android:layout_marginTop="15dp"
+            android:layout_marginTop="10dp"
+            android:layout_marginBottom="10dp"
             android:contentDescription="@string/event_name"
             android:src="@drawable/profile_image" />
 
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="end"
-            android:layout_marginEnd="10dp"
-            android:layout_marginBottom="10dp"
+            android:layout_gravity="end|center"
+            android:layout_marginEnd="20dp"
             android:orientation="vertical">
 
             <TextView
                 android:id="@+id/usernameTextView"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center_horizontal"
+                android:layout_gravity="start"
                 android:layout_marginTop="15dp"
                 android:text="@string/user_name"
                 android:textSize="18sp"
@@ -48,22 +48,13 @@
                 android:id="@+id/roleTextView"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center_horizontal"
+                android:layout_gravity="start"
                 android:text="@string/role"
                 android:textSize="16sp"
                 android:textStyle="bold" />
 
             <Button
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_horizontal"
-                android:layout_marginTop="10dp"
-                android:text="@string/see_details"
-                android:textColor="#795548"
-                android:textStyle="bold"
-                app:cornerRadius="20dp" />
-
-            <Button
+                android:id="@+id/deleteUser"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"

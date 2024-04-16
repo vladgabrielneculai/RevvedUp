@@ -4,6 +4,7 @@ import android.net.Uri;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -16,11 +17,23 @@ import java.util.List;
 
 public class CarsAdapter extends RecyclerView.Adapter<CarsAdapter.UserViewHolder> {
 
-    private final List<Car> cars;
+    private static List<Car> cars = null;
+    private static OnItemClickListener itemClickListener;
 
     public CarsAdapter(List<Car> cars) {
-        this.cars = cars;
+        CarsAdapter.cars = cars;
     }
+
+    public interface OnItemClickListener {
+        void onDetailsClick(Car car);
+
+        void onDeleteClick(Car car);
+    }
+
+    public void setOnItemClickListener(OnItemClickListener listener) {
+        itemClickListener = listener;
+    }
+
     @NonNull
     @Override
     public CarsAdapter.UserViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -48,7 +61,7 @@ public class CarsAdapter extends RecyclerView.Adapter<CarsAdapter.UserViewHolder
                     .error(R.drawable.error_image) // Error image if loading fails
                     .into(holder.carImageView); // ImageView to display the image
         } else {
-             //Handle case where no picture URI is available
+            //Handle case where no picture URI is available
             Glide.with(holder.itemView.getContext())
                     .load(R.drawable.empty_image) // Load placeholder image
                     .into(holder.carImageView); // ImageView to display the image
@@ -66,6 +79,8 @@ public class CarsAdapter extends RecyclerView.Adapter<CarsAdapter.UserViewHolder
         private final TextView carBrandTextView;
         private final TextView carModelTextView;
         private final ImageView carImageView;
+        private final Button viewDetails, deleteCar;
+
 
         public UserViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -73,6 +88,24 @@ public class CarsAdapter extends RecyclerView.Adapter<CarsAdapter.UserViewHolder
             carBrandTextView = itemView.findViewById(R.id.carBrand);
             carModelTextView = itemView.findViewById(R.id.carModel);
             carImageView = itemView.findViewById(R.id.img);
+            viewDetails = itemView.findViewById(R.id.viewDetails);
+            deleteCar = itemView.findViewById(R.id.deleteCar);
+
+            viewDetails.setOnClickListener(v -> {
+                int position = getAdapterPosition();
+                if (position != RecyclerView.NO_POSITION && itemClickListener != null) {
+                    itemClickListener.onDetailsClick(cars.get(position));
+                }
+            });
+
+            deleteCar.setOnClickListener(v -> {
+                int position = getAdapterPosition();
+                if (position != RecyclerView.NO_POSITION && itemClickListener != null) {
+                    itemClickListener.onDeleteClick(cars.get(position));
+                }
+            });
+
+
         }
     }
 }
