@@ -29,7 +29,6 @@
     <string name="event_name">Denumire Eveniment</string>
     <string name="event_date">Data eveniment</string>
     <string name="see_details">Vezi detalii</string>
-    <string name="delete_event">Sterge eveniment</string>
     <string name="modify_profile">Modifică Profilul</string>
     <string name="logout">Deconectare</string>
     <string name="add_event">Adaugă eveniment</string>
@@ -55,7 +54,6 @@
     <string name="modify">Modifică</string>
     <string name="cars_existent">Masinile existente</string>
     <string name="users_existent">Utilizatori existenti</string>
-    <string name="delete_user">Șterge utilizator</string>
     <string name="endDate">Dată final</string>
     <string name="startDate">Dată început</string>
     <string name="details">Detalii</string>
@@ -109,5 +107,9 @@
         bibendum, vel congue leo egestas.
 
     </string>
-    <string name="delete_car">Șterge mașină</string>
+    <string name="delete">Șterge</string>
+    <string name="like_event">Apreciază event</string>
+    <string name="add_car_to_event">Înscrie mașina</string>
+    <string name="my_events">Evenimentele mele</string>
+    <string name="registered_cars">Mașini înscrise</string>
 </resources>

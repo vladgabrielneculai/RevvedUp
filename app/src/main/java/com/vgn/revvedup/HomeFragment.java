@@ -8,9 +8,9 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 
-import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -19,30 +19,21 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
-public class HomeFragment extends Fragment implements OnMapReadyCallback {
-
-    // TODO: If the user is "admin": display charts with statistics about no of events, no of cars, no of users && the same map with events
-    // TODO: If the user is "participant": display a chart with no of accepts and no of rejects && display a map with the events that are in his/hers area (select range between 0km and 150km)
-    // TODO: If the user is "organizator": display a chart with no of likes and dislikes of the event, no of people that registered their car && the same map with events
+public class HomeFragment extends Fragment {
 
     private TextView usernameTextView;
 
-    FirebaseDatabase database;
-    FirebaseAuth mAuth;
-    FirebaseUser user;
-    GoogleMap myMap;
-
+    private FirebaseDatabase database;
+    private FirebaseAuth mAuth;
+    private FirebaseUser user;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        //Inflate the layout for this fragment
-        View view = inflater.inflate(R.layout.fragment_home_admin, container, false);
+        View view = inflater.inflate(R.layout.fragment_home, container, false);
 
-        //Declaration of XML Layout components
         usernameTextView = view.findViewById(R.id.username);
 
-        //Firebase instances
         database = FirebaseDatabase.getInstance();
         mAuth = FirebaseAuth.getInstance();
         user = mAuth.getCurrentUser();
@@ -56,6 +47,9 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback {
                         for (DataSnapshot userSnapshot : snapshot.getChildren()) {
                             String fnameFromDb = userSnapshot.child("fname").getValue(String.class);
                             usernameTextView.setText(String.format("Salut, %s!", fnameFromDb));
+
+                            String role = userSnapshot.child("role").getValue(String.class);
+                            loadUserSpecificFragment(role);
                         }
                     } else {
                         usernameTextView.setText(R.string.username);
@@ -72,9 +66,30 @@ public class HomeFragment extends Fragment implements OnMapReadyCallback {
         return view;
     }
 
+    private void loadUserSpecificFragment(String role) {
+        FragmentManager fragmentManager = getChildFragmentManager();
+        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
 
-    @Override
-    public void onMapReady(@NonNull GoogleMap googleMap) {
-        myMap = googleMap;
+        Fragment fragment = null;
+
+        switch (role) {
+            case "Admin":
+                // Încarcă conținut specific pentru admin în FragmentContainerView
+                fragment = new AdminFragment(); // presupunând că există un AdminFragment definit
+                break;
+            case "Organizator":
+                // Încarcă conținut specific pentru event admin în FragmentContainerView
+                fragment = new EventAdminFragment(); // presupunând că există un EventAdminFragment definit
+                break;
+            case "Participant":
+                // Încarcă conținut specific pentru participant în FragmentContainerView
+                fragment = new ParticipantFragment(); // presupunând că există un ParticipantFragment definit
+                break;
+        }
+
+        if (fragment != null) {
+            fragmentTransaction.replace(R.id.user_specific_content_container, fragment);
+            fragmentTransaction.commit();
+        }
     }
 }

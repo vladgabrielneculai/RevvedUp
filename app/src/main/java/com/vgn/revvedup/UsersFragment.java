@@ -59,21 +59,18 @@ public class UsersFragment extends Fragment {
             }
         });
 
-        adapter.setOnItemClickListener(new UsersAdapter.OnItemClickListener() {
-            @Override
-            public void onDeleteClick(User user) {
-                DatabaseReference usersRef = database.getReference("users");
-                String username = user.getUsername(); // presupunând că fiecare mașină are un cheie unic în baza de date
+        adapter.setOnItemClickListener(user -> {
+            DatabaseReference usersRef = database.getReference("users");
+            String username = user.getUsername(); // presupunând că fiecare mașină are un cheie unic în baza de date
 
-                // Șterge mașina din baza de date
-                usersRef.child(username).removeValue().addOnSuccessListener(aVoid -> {
-                    // Ștergere reușită
-                    Toast.makeText(getActivity(), "Mașina a fost ștearsă cu succes", Toast.LENGTH_SHORT).show();
-                }).addOnFailureListener(e -> {
-                    // Întâmpinare erori în timpul ștergerii
-                    Toast.makeText(getActivity(), "Eroare la ștergerea mașinii: " + e.getMessage(), Toast.LENGTH_SHORT).show();
-                });
-            }
+            // Șterge mașina din baza de date
+            usersRef.child(username).removeValue().addOnSuccessListener(aVoid -> {
+                // Ștergere reușită
+                Toast.makeText(getActivity(), "Utilizatorul a fost șters cu succes", Toast.LENGTH_SHORT).show();
+            }).addOnFailureListener(e -> {
+                // Întâmpinare erori în timpul ștergerii
+                Toast.makeText(getActivity(), "Eroare la ștergerea utilizatorului: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+            });
         });
 
         return view;

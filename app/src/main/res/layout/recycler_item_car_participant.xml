@@ -79,7 +79,7 @@
                     android:id="@+id/deleteCar"
                     android:layout_width="160dp"
                     android:layout_height="wrap_content"
-                    android:text="@string/delete_car"
+                    android:text="@string/delete"
                     android:textColor="#795548"
                     android:textStyle="bold"
                     app:cornerRadius="30dp"

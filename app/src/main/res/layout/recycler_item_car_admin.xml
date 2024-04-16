@@ -59,33 +59,35 @@
                 android:textSize="16sp"
                 android:textStyle="bold" />
 
+
+
             <LinearLayout
                 android:layout_width="350dp"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:layout_marginVertical="10dp">
+                android:layout_marginVertical="10dp"
+                android:orientation="horizontal">
 
                 <Button
                     android:id="@+id/viewDetails"
                     android:layout_width="160dp"
                     android:layout_height="wrap_content"
+                    android:layout_marginHorizontal="10dp"
                     android:text="@string/see_details"
                     android:textColor="#795548"
                     android:textStyle="bold"
-                    app:cornerRadius="30dp"
-                    android:layout_marginHorizontal="10dp"/>
+                    app:cornerRadius="30dp" />
 
                 <Button
                     android:id="@+id/deleteCar"
                     android:layout_width="160dp"
                     android:layout_height="wrap_content"
-                    android:text="@string/delete_car"
+                    android:text="@string/delete"
                     android:textColor="#795548"
                     android:textStyle="bold"
-                    app:cornerRadius="30dp"
-                    />
+                    app:cornerRadius="30dp" />
 
             </LinearLayout>
+
 
 
 

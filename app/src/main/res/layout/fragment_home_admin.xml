@@ -1,52 +1,35 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:orientation="vertical"
     tools:context=".HomeFragment">
 
-    <LinearLayout
+    <com.github.mikephil.charting.charts.PieChart
+        android:id="@+id/pieChartMods"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical">
+        android:layout_height="400dp"
+        android:layout_marginTop="5dp" />
 
-        <TextView
-            android:id="@+id/username"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="10sp"
-            android:layout_marginTop="20sp"
-            android:text=""
-            android:textColor="@color/midnight_blue"
-            android:textSize="30sp" />
+    <com.github.mikephil.charting.charts.PieChart
+        android:id="@+id/pieChartCars"
+        android:layout_width="match_parent"
+        android:layout_height="400dp"
+        android:layout_marginTop="5dp" />
 
-        <com.github.mikephil.charting.charts.PieChart
-            android:layout_width="match_parent"
-            android:layout_height="400dp"
-            android:id="@+id/pieChartMods"
-            android:layout_marginTop="5dp"/>
-
-        <com.github.mikephil.charting.charts.PieChart
-            android:layout_width="match_parent"
-            android:layout_height="400dp"
-            android:id="@+id/pieChartCars"
-            android:layout_marginTop="5dp"/>
-
-        <com.github.mikephil.charting.charts.PieChart
-            android:layout_width="match_parent"
-            android:layout_height="400dp"
-            android:id="@+id/pieChartEvents"
-            android:layout_marginTop="5dp"/>
+    <com.github.mikephil.charting.charts.PieChart
+        android:id="@+id/pieChartEvents"
+        android:layout_width="match_parent"
+        android:layout_height="400dp"
+        android:layout_marginTop="5dp" />
 
 
-        <androidx.fragment.app.FragmentContainerView
-            android:id="@+id/location_map"
-            android:name="com.google.android.gms.maps.SupportMapFragment"
-            android:layout_width="match_parent"
-            android:layout_height="400dp"
-            android:layout_marginTop="5dp" />
+    <androidx.fragment.app.FragmentContainerView
+        android:id="@+id/location_map"
+        android:name="com.google.android.gms.maps.SupportMapFragment"
+        android:layout_width="match_parent"
+        android:layout_height="400dp"
+        android:layout_marginTop="5dp" />
 
-    </LinearLayout>
-
-
-</ScrollView>
+</LinearLayout>
