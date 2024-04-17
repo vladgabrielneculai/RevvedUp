@@ -64,11 +64,18 @@ public class CarsFragment extends Fragment {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot snapshot) {
                     if (snapshot.exists()) {
-                        String role = snapshot.child("role").getValue(String.class);
-                        if (role != null && role.equals("Participant")) {
-                            fetchUserCars(userEmail);
-                        } else {
-                            fetchCars();
+                        for (DataSnapshot userSnapshot : snapshot.getChildren()) {
+                            String roleFromDb = userSnapshot.child("role").getValue(String.class);
+
+                            switch (Objects.requireNonNull(roleFromDb)) {
+                                case "Participant":
+                                    fetchUserCars(userEmail);
+                                    break;
+                                case "Admin":
+                                case "Organizator":
+                                    fetchCars();
+                                    break;
+                            }
                         }
                     }
                 }
@@ -96,11 +103,18 @@ public class CarsFragment extends Fragment {
                         @Override
                         public void onDataChange(@NonNull DataSnapshot snapshot) {
                             if (snapshot.exists()) {
-                                String role = snapshot.child("role").getValue(String.class);
-                                if (Objects.requireNonNull(role).equals("Participant")) {
-                                    fetchUserCars(userEmail, newText);
-                                } else {
-                                    fetchCars(newText);
+                                for (DataSnapshot userSnapshot : snapshot.getChildren()) {
+                                    String roleFromDb = userSnapshot.child("role").getValue(String.class);
+
+                                    switch (Objects.requireNonNull(roleFromDb)) {
+                                        case "Participant":
+                                            fetchUserCars(userEmail, newText);
+                                            break;
+                                        case "Admin":
+                                        case "Organizator":
+                                            fetchCars(newText);
+                                            break;
+                                    }
                                 }
                             }
                         }
