@@ -10,6 +10,7 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
 import com.github.mikephil.charting.charts.PieChart;
+import com.github.mikephil.charting.components.Legend;
 import com.github.mikephil.charting.data.PieData;
 import com.github.mikephil.charting.data.PieDataSet;
 import com.github.mikephil.charting.data.PieEntry;
@@ -28,9 +29,9 @@ import java.util.Map;
 public class AdminHomeFragment extends Fragment {
 
     private DatabaseReference databaseReference;
-    private PieChart modsPieChart, carsPieChart, eventsPieChart;
-    private PieDataSet modsDataSet, carsDataSet, eventsDataSet;
-    private List<PieEntry> modsPC, carsPC, eventsPC;
+    private PieChart modsPieChart;
+    private PieDataSet modsDataSet;
+    private List<PieEntry> modsPC;
 
     public AdminHomeFragment() {
         // Required empty public constructor
@@ -40,16 +41,11 @@ public class AdminHomeFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_home_admin, container, false);
         modsPieChart = view.findViewById(R.id.pieChartMods);
-        carsPieChart = view.findViewById(R.id.pieChartCars);
-        eventsPieChart = view.findViewById(R.id.pieChartEvents);
 
         modsPC = new ArrayList<>();
-        carsPC = new ArrayList<>();
-        eventsPC = new ArrayList<>();
 
         modsDataSet = new PieDataSet(modsPC, "Modificări auto");
-        carsDataSet = new PieDataSet(carsPC, "Mașini");
-        eventsDataSet = new PieDataSet(eventsPC, "Evenimente");
+
 
         // Initialize Firebase Database
         FirebaseDatabase database = FirebaseDatabase.getInstance();
@@ -96,6 +92,8 @@ public class AdminHomeFragment extends Fragment {
                 // Create a data set for Mods PieChart
                 modsDataSet = new PieDataSet(modsPC, "Modificări auto");
                 modsDataSet.setColors(colors);
+                modsDataSet.setValueTextSize(18);
+                modsDataSet.setDrawValues(true);
 
                 // Update Mods PieChart
                 updateModsPieChart();
@@ -121,6 +119,19 @@ public class AdminHomeFragment extends Fragment {
 
         // Refresh Mods PieChart
         modsPieChart.invalidate();
+
+        //Get rid of the Description Label
+        modsPieChart.getDescription().setEnabled(false);
+
+        //Set center text
+        modsPieChart.setCenterText("Modificări auto");
+        modsPieChart.setDrawEntryLabels(true);
+        modsPieChart.setHoleRadius(50);
+        modsPieChart.setCenterTextSize(16);
+
+        Legend legend = modsPieChart.getLegend();
+        legend.setEnabled(false);
+
     }
 
     @Override

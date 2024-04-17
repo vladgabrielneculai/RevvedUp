@@ -14,6 +14,8 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -22,6 +24,7 @@ import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public class CarsFragment extends Fragment {
 
@@ -30,6 +33,8 @@ public class CarsFragment extends Fragment {
     // TODO: If the user is "organizator": display all the cars that registered in his/hers event & create functionality so that the event admin can accept or refuse the car in his event
 
     private FirebaseDatabase database;
+    private FirebaseAuth mAuth;
+    private FirebaseUser user;
     private List<Car> cars;
     private CarsAdapter adapter;
 
@@ -41,6 +46,8 @@ public class CarsFragment extends Fragment {
 
         //Initialize Firebase Database and Event List
         database = FirebaseDatabase.getInstance();
+        mAuth = FirebaseAuth.getInstance();
+        user = mAuth.getCurrentUser();
         cars = new ArrayList<>();
 
         RecyclerView carRecyclerView = view.findViewById(R.id.carRecyclerView);
@@ -49,7 +56,29 @@ public class CarsFragment extends Fragment {
         adapter = new CarsAdapter(cars);
         carRecyclerView.setAdapter(adapter);
 
-        fetchCars();
+        if (user != null) {
+            String userEmail = user.getEmail();
+            DatabaseReference usersRef = database.getReference("users");
+            usersRef.orderByChild("uid").equalTo(user.getUid()).addListenerForSingleValueEvent(new ValueEventListener() {
+
+                @Override
+                public void onDataChange(@NonNull DataSnapshot snapshot) {
+                    if (snapshot.exists()) {
+                        String role = snapshot.child("role").getValue(String.class);
+                        if (role != null && role.equals("Participant")) {
+                            fetchUserCars(userEmail);
+                        } else {
+                            fetchCars();
+                        }
+                    }
+                }
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError error) {
+
+                }
+            });
+        }
 
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
@@ -59,7 +88,29 @@ public class CarsFragment extends Fragment {
 
             @Override
             public boolean onQueryTextChange(String newText) {
-                fetchCars(newText);
+                String userEmail = user.getEmail();
+                if (userEmail != null) {
+                    DatabaseReference usersRef = database.getReference("users");
+                    usersRef.child(userEmail).addListenerForSingleValueEvent(new ValueEventListener() {
+
+                        @Override
+                        public void onDataChange(@NonNull DataSnapshot snapshot) {
+                            if (snapshot.exists()) {
+                                String role = snapshot.child("role").getValue(String.class);
+                                if (Objects.requireNonNull(role).equals("Participant")) {
+                                    fetchUserCars(userEmail, newText);
+                                } else {
+                                    fetchCars(newText);
+                                }
+                            }
+                        }
+
+                        @Override
+                        public void onCancelled(@NonNull DatabaseError error) {
+
+                        }
+                    });
+                }
                 return false;
             }
         });
@@ -67,14 +118,14 @@ public class CarsFragment extends Fragment {
         adapter.setOnItemClickListener(new CarsAdapter.OnItemClickListener() {
             @Override
             public void onDetailsClick(Car car) {
-                    // Deschideți EventDetailsActivity și trimiteți detalii despre eveniment
-                    Intent intent = new Intent(getActivity(), CarDetails.class);
-                    intent.putExtra("carRegistration", car.getCarRegistration());
-                    startActivity(intent);
+                // Deschideți EventDetailsActivity și trimiteți detalii despre eveniment
+                Intent intent = new Intent(getActivity(), CarDetails.class);
+                intent.putExtra("carRegistration", car.getCarRegistration());
+                startActivity(intent);
             }
 
             @Override
-            public void onDeleteClick(Car car){
+            public void onDeleteClick(Car car) {
                 DatabaseReference carsRef = database.getReference("cars");
                 String carRegistration = car.getCarRegistration(); // presupunând că fiecare mașină are un cheie unic în baza de date
 
@@ -139,4 +190,51 @@ public class CarsFragment extends Fragment {
             }
         });
     }
+
+    private void fetchUserCars(String userEmail) {
+        DatabaseReference carsRef = database.getReference("cars");
+
+        carsRef.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                cars.clear();
+                for (DataSnapshot carSnapshot : snapshot.getChildren()) {
+                    Car car = carSnapshot.getValue(Car.class);
+                    if (car != null && car.getCarOwner().equals(userEmail)) {
+                        cars.add(car);
+                    }
+                }
+                adapter.notifyDataSetChanged();
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                Log.w("CarsFragment", "Failed to fetch user cars:", error.toException());
+            }
+        });
+    }
+
+    private void fetchUserCars(String userEmail, String searchTerm) {
+        DatabaseReference carsRef = database.getReference("cars");
+
+        carsRef.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                cars.clear();
+                for (DataSnapshot carSnapshot : snapshot.getChildren()) {
+                    Car car = carSnapshot.getValue(Car.class);
+                    if (car != null && car.getCarOwner().equals(userEmail) && (car.getCarBrand().toLowerCase().contains(searchTerm.toLowerCase()) || car.getCarModel().toLowerCase().contains(searchTerm.toLowerCase()) || car.getCarRegistration().toLowerCase().contains(searchTerm.toLowerCase()))) {
+                        cars.add(car);
+                    }
+                }
+                adapter.notifyDataSetChanged();
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                Log.w("CarsFragment", "Failed to fetch user cars:", error.toException());
+            }
+        });
+    }
 }
+

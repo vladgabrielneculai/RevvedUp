@@ -83,12 +83,12 @@ public class CarDetails extends AppCompatActivity {
 
                             // Adăugați fiecare URL de imagine în slideModels
                             for (String imageUrl : car.getCarPicturesUri()) {
-                                slideModels.add(new SlideModel(imageUrl, ScaleTypes.FIT));
+                                slideModels.add(new SlideModel(imageUrl, ScaleTypes.CENTER_CROP));
                             }
                         }
                     }
                     // Setează lista de imagini în ImageSlider după ce au fost adăugate toate URL-urile
-                    imageSlider.setImageList(slideModels, ScaleTypes.FIT);
+                    imageSlider.setImageList(slideModels, ScaleTypes.CENTER_CROP);
                 }
 
                 @Override
