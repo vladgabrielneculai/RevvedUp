@@ -33,7 +33,7 @@
                 android:layout_width="175dp"
                 android:layout_height="175dp"
                 android:contentDescription="@string/event_image"
-                android:scaleType="center"
+                android:scaleType="fitCenter"
                 android:src="@drawable/empty_image" />
 
         </androidx.cardview.widget.CardView>

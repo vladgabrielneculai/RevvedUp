@@ -14,6 +14,8 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -22,6 +24,7 @@ import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public class EventsFragment extends Fragment {
 
@@ -30,17 +33,21 @@ public class EventsFragment extends Fragment {
     // TODO: If the user is "participant": display the events based on the recommandation algorithm
 
     private FirebaseDatabase database;
+    private FirebaseAuth mAuth;
+    private FirebaseUser user;
     private List<Event> events;
+
     private EventsAdapter adapter;
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_event, container, false);
 
         //Initialize Firebase Database and Event List
         database = FirebaseDatabase.getInstance();
+        mAuth = FirebaseAuth.getInstance();
+        user = mAuth.getCurrentUser();
         events = new ArrayList<>();
 
         RecyclerView eventRecyclerView = view.findViewById(R.id.eventRecyclerView);
@@ -49,7 +56,35 @@ public class EventsFragment extends Fragment {
         adapter = new EventsAdapter(events);
         eventRecyclerView.setAdapter(adapter);
 
-        fetchEvents();
+        if (user != null) {
+            String userEmail = user.getEmail();
+            DatabaseReference usersRef = database.getReference("users");
+            usersRef.orderByChild("uid").equalTo(user.getUid()).addListenerForSingleValueEvent(new ValueEventListener() {
+
+                @Override
+                public void onDataChange(@NonNull DataSnapshot snapshot) {
+                    if (snapshot.exists()) {
+                        for (DataSnapshot userSnapshot : snapshot.getChildren()) {
+                            String roleFromDb = userSnapshot.child("role").getValue(String.class);
+                            switch (Objects.requireNonNull(roleFromDb)) {
+                                case "Participant":
+                                case "Admin":
+                                    fetchEvents();
+                                    break;
+                                case "Organizator":
+                                    fetchEventAdminEvents(userEmail);
+                                    break;
+                            }
+                        }
+                    }
+                }
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError error) {
+
+                }
+            });
+        }
 
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
@@ -59,7 +94,37 @@ public class EventsFragment extends Fragment {
 
             @Override
             public boolean onQueryTextChange(String newText) {
-                fetchEvents(newText);
+                String userEmail = user.getEmail();
+                if (userEmail != null) {
+                    DatabaseReference usersRef = database.getReference("users");
+                    usersRef.child(userEmail).addListenerForSingleValueEvent(new ValueEventListener() {
+
+                        @Override
+                        public void onDataChange(@NonNull DataSnapshot snapshot) {
+                            if (snapshot.exists()) {
+                                for (DataSnapshot userSnapshot : snapshot.getChildren()) {
+                                    String roleFromDb = userSnapshot.child("role").getValue(String.class);
+
+                                    switch (Objects.requireNonNull(roleFromDb)) {
+                                        case "Admin":
+                                        case "Participant":
+                                            fetchEvents(newText);
+                                            break;
+                                        case "Organizator":
+                                            fetchEventAdminEvents(userEmail, newText);
+                                            break;
+
+                                    }
+                                }
+                            }
+                        }
+
+                        @Override
+                        public void onCancelled(@NonNull DatabaseError error) {
+
+                        }
+                    });
+                }
                 return false;
             }
         });
@@ -74,7 +139,7 @@ public class EventsFragment extends Fragment {
             }
 
             @Override
-            public void onDeleteClick(Event event){
+            public void onDeleteClick(Event event) {
                 DatabaseReference carsRef = database.getReference("events");
                 String eventName = event.getName(); // presupunând că fiecare mașină are un cheie unic în baza de date
 
@@ -139,5 +204,52 @@ public class EventsFragment extends Fragment {
             }
         });
     }
+
+    private void fetchEventAdminEvents(String userEmail) {
+        DatabaseReference carsRef = database.getReference("events");
+
+        carsRef.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                events.clear();
+                for (DataSnapshot eventSnapshot : snapshot.getChildren()) {
+                    Event event = eventSnapshot.getValue(Event.class);
+                    if (event != null && event.getEventOwner().equals(userEmail)) {
+                        events.add(event);
+                    }
+                }
+                adapter.notifyDataSetChanged();
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                Log.w("CarsFragment", "Failed to fetch user cars:", error.toException());
+            }
+        });
+    }
+
+    private void fetchEventAdminEvents(String userEmail, String searchTerm) {
+        DatabaseReference carsRef = database.getReference("events");
+
+        carsRef.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                events.clear();
+                for (DataSnapshot eventSnapshot : snapshot.getChildren()) {
+                    Event event = eventSnapshot.getValue(Event.class);
+                    if (event != null && event.getEventOwner().equals(userEmail) && (event.getName().toLowerCase().contains(searchTerm.toLowerCase()) || event.getLocation().toLowerCase().contains(searchTerm.toLowerCase()))) {
+                        events.add(event);
+                    }
+                }
+                adapter.notifyDataSetChanged();
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                Log.w("CarsFragment", "Failed to fetch user cars:", error.toException());
+            }
+        });
+    }
+
 
 }

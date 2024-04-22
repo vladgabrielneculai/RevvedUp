@@ -24,12 +24,12 @@
 
             <ImageView
                 android:id="@+id/img"
-                android:layout_width="350dp"
+                android:layout_width="match_parent"
                 android:layout_height="250dp"
                 android:layout_gravity="center"
                 android:layout_marginVertical="10dp"
                 android:contentDescription="@string/event_name"
-                android:scaleType="centerCrop"
+                android:scaleType="fitCenter"
                 android:src="@drawable/empty_image" />
 
             <TextView
