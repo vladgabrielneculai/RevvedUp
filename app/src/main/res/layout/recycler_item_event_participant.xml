@@ -29,7 +29,7 @@
                 android:layout_gravity="center"
                 android:layout_marginVertical="10dp"
                 android:contentDescription="@string/event_name"
-                android:scaleType="centerCrop"
+                android:scaleType="fitCenter"
                 android:src="@drawable/empty_image" />
 
             <TextView
@@ -103,7 +103,6 @@
                 android:id="@+id/viewDetails"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-
                 android:text="@string/see_details"
                 android:textColor="#795548"
                 android:textStyle="bold"

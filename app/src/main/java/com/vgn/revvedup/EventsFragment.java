@@ -53,8 +53,6 @@ public class EventsFragment extends Fragment {
         RecyclerView eventRecyclerView = view.findViewById(R.id.eventRecyclerView);
         SearchView searchView = view.findViewById(R.id.searchView);
         eventRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-        adapter = new EventsAdapter(events);
-        eventRecyclerView.setAdapter(adapter);
 
         if (user != null) {
             String userEmail = user.getEmail();
@@ -66,14 +64,58 @@ public class EventsFragment extends Fragment {
                     if (snapshot.exists()) {
                         for (DataSnapshot userSnapshot : snapshot.getChildren()) {
                             String roleFromDb = userSnapshot.child("role").getValue(String.class);
-                            switch (Objects.requireNonNull(roleFromDb)) {
-                                case "Participant":
-                                case "Admin":
-                                    fetchEvents();
-                                    break;
-                                case "Organizator":
-                                    fetchEventAdminEvents(userEmail);
-                                    break;
+                            // Verificare pentru a preveni NullPointerException
+                            if (roleFromDb != null) {
+                                // Inițializare adapter și setare RecyclerView
+                                adapter = new EventsAdapter(events, roleFromDb);
+                                eventRecyclerView.setAdapter(adapter);
+
+                                // Switch pe rolul utilizatorului pentru a afișa evenimentele corespunzătoare
+                                switch (roleFromDb) {
+                                    case "Participant":
+                                    case "Admin":
+                                        fetchEvents();
+                                        break;
+                                    case "Organizator":
+                                        fetchEventAdminEvents(userEmail);
+                                        break;
+                                }
+
+                                adapter.setOnItemClickListener(new EventsAdapter.OnItemClickListener() {
+                                    @Override
+                                    public void onDetailsClick(Event event) {
+                                        // Deschideți EventDetailsActivity și trimiteți detalii despre eveniment
+                                        Intent intent = new Intent(getActivity(), EventDetails.class);
+                                        intent.putExtra("name", event.getName());
+                                        startActivity(intent);
+                                    }
+
+                                    @Override
+                                    public void onDeleteClick(Event event) {
+                                        DatabaseReference carsRef = database.getReference("events");
+                                        String eventName = event.getName(); // presupunând că fiecare mașină are un cheie unic în baza de date
+
+                                        // Șterge mașina din baza de date
+                                        carsRef.child(eventName).removeValue().addOnSuccessListener(aVoid -> {
+                                            // Ștergere reușită
+                                            Toast.makeText(getActivity(), "Evenimentul a fost șters cu succes", Toast.LENGTH_SHORT).show();
+                                        }).addOnFailureListener(e -> {
+                                            // Întâmpinare erori în timpul ștergerii
+                                            Toast.makeText(getActivity(), "Eroare la ștergerea evenimentului : " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                                        });
+                                    }
+
+                                    @Override
+                                    public void onLikeEvent(Event event) {
+
+                                    }
+
+                                    @Override
+                                    public void onAddCarToEvent(Event event) {
+
+                                    }
+
+                                });
                             }
                         }
                     }
@@ -86,6 +128,7 @@ public class EventsFragment extends Fragment {
             });
         }
 
+
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
@@ -97,14 +140,13 @@ public class EventsFragment extends Fragment {
                 String userEmail = user.getEmail();
                 if (userEmail != null) {
                     DatabaseReference usersRef = database.getReference("users");
-                    usersRef.child(userEmail).addListenerForSingleValueEvent(new ValueEventListener() {
+                    usersRef.orderByChild("uid").equalTo(user.getUid()).addListenerForSingleValueEvent(new ValueEventListener() {
 
                         @Override
                         public void onDataChange(@NonNull DataSnapshot snapshot) {
                             if (snapshot.exists()) {
                                 for (DataSnapshot userSnapshot : snapshot.getChildren()) {
                                     String roleFromDb = userSnapshot.child("role").getValue(String.class);
-
                                     switch (Objects.requireNonNull(roleFromDb)) {
                                         case "Admin":
                                         case "Participant":
@@ -126,31 +168,6 @@ public class EventsFragment extends Fragment {
                     });
                 }
                 return false;
-            }
-        });
-
-        adapter.setOnItemClickListener(new EventsAdapter.OnItemClickListener() {
-            @Override
-            public void onDetailsClick(Event event) {
-                // Deschideți EventDetailsActivity și trimiteți detalii despre eveniment
-                Intent intent = new Intent(getActivity(), EventDetails.class);
-                intent.putExtra("name", event.getName());
-                startActivity(intent);
-            }
-
-            @Override
-            public void onDeleteClick(Event event) {
-                DatabaseReference carsRef = database.getReference("events");
-                String eventName = event.getName(); // presupunând că fiecare mașină are un cheie unic în baza de date
-
-                // Șterge mașina din baza de date
-                carsRef.child(eventName).removeValue().addOnSuccessListener(aVoid -> {
-                    // Ștergere reușită
-                    Toast.makeText(getActivity(), "Evenimentul a fost șters cu succes", Toast.LENGTH_SHORT).show();
-                }).addOnFailureListener(e -> {
-                    // Întâmpinare erori în timpul ștergerii
-                    Toast.makeText(getActivity(), "Eroare la ștergerea evenimentului : " + e.getMessage(), Toast.LENGTH_SHORT).show();
-                });
             }
         });
 
