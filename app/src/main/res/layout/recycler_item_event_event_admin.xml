@@ -98,32 +98,33 @@
 
             </LinearLayout>
 
-            <LinearLayout
-                android:layout_width="350dp"
+
+            <Button
+                android:id="@+id/viewDetails"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginVertical="10dp"
-                android:orientation="horizontal">
+                android:text="@string/see_details"
+                android:textColor="#795548"
+                android:textStyle="bold"
+                app:cornerRadius="30dp" />
 
-                <Button
-                    android:id="@+id/viewDetails"
-                    android:layout_width="160dp"
-                    android:layout_height="wrap_content"
-                    android:layout_marginHorizontal="10dp"
-                    android:text="@string/see_details"
-                    android:textColor="#795548"
-                    android:textStyle="bold"
-                    app:cornerRadius="30dp" />
+            <Button
+                android:id="@+id/modifyEvent"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/modify"
+                android:textColor="#795548"
+                android:textStyle="bold"
+                app:cornerRadius="30dp" />
 
-                <Button
-                    android:id="@+id/deleteEvent"
-                    android:layout_width="160dp"
-                    android:layout_height="wrap_content"
-                    android:text="@string/delete"
-                    android:textColor="#795548"
-                    android:textStyle="bold"
-                    app:cornerRadius="30dp" />
-
-            </LinearLayout>
+            <Button
+                android:id="@+id/deleteEvent"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/delete"
+                android:textColor="#795548"
+                android:textStyle="bold"
+                app:cornerRadius="30dp" />
 
         </LinearLayout>
 

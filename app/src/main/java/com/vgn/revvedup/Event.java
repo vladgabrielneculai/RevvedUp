@@ -1,5 +1,6 @@
 package com.vgn.revvedup;
 
+import java.util.HashMap;
 import java.util.List;
 
 public class Event {
@@ -7,9 +8,12 @@ public class Event {
     private String name, details, startDate, endDate, location, eventImage, eventOwner, eventType;
     private int noLikes, noCars;
     private List<String> modsAllowed, eventCompetitions;
+    private HashMap<String, Boolean> userLikes;
+
+
     private double latitude, longitude;
 
-    public Event(String name, String details, String startDate, String endDate, String location,double latitude, double longitude, String eventType, String eventImage, String eventOwner, List<String> modsAllowed, List<String> eventCompetitions, int noLikes, int noCars) {
+    public Event(String name, String details, String startDate, String endDate, String location, double latitude, double longitude, String eventType, String eventImage, String eventOwner, List<String> modsAllowed, List<String> eventCompetitions, int noLikes, HashMap<String, Boolean> userLikes, int noCars) {
         this.name = name;
         this.details = details;
         this.startDate = startDate;
@@ -23,8 +27,10 @@ public class Event {
         this.modsAllowed = modsAllowed;
         this.eventCompetitions = eventCompetitions;
         this.noLikes = noLikes;
+        this.userLikes = userLikes;
         this.noCars = noCars;
     }
+
 
     public Event() {
     }
@@ -91,6 +97,14 @@ public class Event {
 
     public void setNoLikes(int noLikes) {
         this.noLikes = noLikes;
+    }
+
+    public HashMap<String, Boolean> getUserLikes() {
+        return userLikes;
+    }
+
+    public void setUserLikes(HashMap<String, Boolean> userLikes) {
+        this.userLikes = userLikes;
     }
 
     public int getNoCars() {

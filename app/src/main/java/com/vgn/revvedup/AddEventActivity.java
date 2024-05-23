@@ -39,6 +39,7 @@ import org.jetbrains.annotations.NotNull;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
 
@@ -289,45 +290,36 @@ public class AddEventActivity extends AppCompatActivity implements OnMapReadyCal
 
             int noLikes = 0;
             int noCars = 0;
+            HashMap<String, Boolean> userLikes = new HashMap<>();
+
 
             if (selectedImageUri != null) {
-                // Get the filename from the event name
-                String filename = name.toLowerCase().replace(" ", "_") + ".jpg"; // Assuming the image format is JPEG
+                String filename = name.toLowerCase().replace(" ", "_") + ".jpg";
 
-                // Get a reference to the Firebase Storae location where the image will be stored
                 StorageReference imageRef = storageRef.child("event_images/" + filename);
 
-                // Upload the image to Firebase Storage
                 imageRef.putFile(selectedImageUri)
                         .addOnSuccessListener(taskSnapshot -> {
-                            // Image uploaded successfully
-                            // Get the download URL of the image
                             imageRef.getDownloadUrl().addOnSuccessListener(uri -> {
-                                // Save the download URL to the event object or store it wherever needed
                                 String eventImage = uri.toString();
-                                Event event = new Event(name, details, startDate, endDate, location, latitude, longitude, eventType, eventImage, eventOwner, modsAllowed, eventCompetitions, noLikes, noCars);
-                                // Proceed with adding the event to the database
+                                Event event = new Event(name, details, startDate, endDate, location, latitude, longitude, eventType, eventImage, eventOwner, modsAllowed, eventCompetitions, noLikes, userLikes, noCars);
                                 eventsRef.child(name).setValue(event);
                                 finish();
                             }).addOnFailureListener(exception -> {
-                                // Handle any errors that occurred during the process of getting the download URL
                                 Toast.makeText(AddEventActivity.this, "S-a produs o eroare la încărcarea imaginii. Vă rugăm reîncercați!", Toast.LENGTH_SHORT).show();
                             });
                         })
                         .addOnFailureListener(exception -> {
-                            // Handle any errors that occurred during the upload process
                             Toast.makeText(AddEventActivity.this, "S-a produs o eroare la încărcarea imaginii. Vă rugăm reîncercați!", Toast.LENGTH_SHORT).show();
                         });
             } else {
-                // If no image is selected, proceed with adding the event to the database without an image
                 String eventImage = "";
-                Event event = new Event(name, details, startDate, endDate, location, latitude, longitude, eventType, eventImage, eventOwner, modsAllowed, eventCompetitions, noLikes, noCars);
+                Event event = new Event(name, details, startDate, endDate, location, latitude, longitude, eventType, eventImage, eventOwner, modsAllowed, eventCompetitions, noLikes, userLikes, noCars);
                 eventsRef.child(name).setValue(event);
                 finish();
             }
         });
 
-        //Back button
         back.setOnClickListener(v -> finish());
     }
 

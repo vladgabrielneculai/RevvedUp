@@ -10,6 +10,7 @@ import android.widget.SearchView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -20,6 +21,8 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.MutableData;
+import com.google.firebase.database.Transaction;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
@@ -92,27 +95,93 @@ public class EventsFragment extends Fragment {
 
                                     @Override
                                     public void onDeleteClick(Event event) {
-                                        DatabaseReference carsRef = database.getReference("events");
-                                        String eventName = event.getName(); // presupunând că fiecare mașină are un cheie unic în baza de date
+                                        DatabaseReference eventsRef = database.getReference("events");
+                                        String eventName = event.getName();
 
-                                        // Șterge mașina din baza de date
-                                        carsRef.child(eventName).removeValue().addOnSuccessListener(aVoid -> {
-                                            // Ștergere reușită
+                                        eventsRef.child(eventName).removeValue().addOnSuccessListener(aVoid -> {
                                             Toast.makeText(getActivity(), "Evenimentul a fost șters cu succes", Toast.LENGTH_SHORT).show();
                                         }).addOnFailureListener(e -> {
-                                            // Întâmpinare erori în timpul ștergerii
                                             Toast.makeText(getActivity(), "Eroare la ștergerea evenimentului : " + e.getMessage(), Toast.LENGTH_SHORT).show();
                                         });
                                     }
 
                                     @Override
                                     public void onLikeEvent(Event event) {
+                                        DatabaseReference eventRef = database.getReference("events").child(event.getName());
+                                        DatabaseReference likesRef = eventRef.child("noLikes");
+                                        DatabaseReference userLikesRef = eventRef.child("userLikes").child(user.getUid());
 
+                                        userLikesRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                                            @Override
+                                            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                                                boolean alreadyLiked = snapshot.exists();
+
+                                                if (alreadyLiked) {
+                                                    // Utilizatorul a apreciat deja evenimentul, deci elimină like-ul
+                                                    likesRef.runTransaction(new Transaction.Handler() {
+                                                        @NonNull
+                                                        @Override
+                                                        public Transaction.Result doTransaction(@NonNull MutableData currentData) {
+                                                            Long likes = currentData.getValue(Long.class);
+                                                            if (likes != null) {
+                                                                currentData.setValue(likes - 1);
+                                                            }
+                                                            return Transaction.success(currentData);
+                                                        }
+
+                                                        @Override
+                                                        public void onComplete(@Nullable DatabaseError error, boolean committed, @Nullable DataSnapshot currentData) {
+                                                            if (committed) {
+                                                                userLikesRef.removeValue();
+                                                                Toast.makeText(getActivity(), "Ai dezapreciat evenimentul", Toast.LENGTH_SHORT).show();
+                                                            } else {
+                                                                Toast.makeText(getActivity(), "Eroare la dezaprecierea evenimentului", Toast.LENGTH_SHORT).show();
+                                                            }
+                                                        }
+                                                    });
+                                                } else {
+                                                    // Utilizatorul nu a apreciat încă evenimentul, deci adaugă like-ul
+                                                    likesRef.runTransaction(new Transaction.Handler() {
+                                                        @NonNull
+                                                        @Override
+                                                        public Transaction.Result doTransaction(@NonNull MutableData currentData) {
+                                                            Long likes = currentData.getValue(Long.class);
+                                                            if (likes != null) {
+                                                                currentData.setValue(likes + 1);
+                                                            }
+                                                            return Transaction.success(currentData);
+                                                        }
+
+                                                        @Override
+                                                        public void onComplete(@Nullable DatabaseError error, boolean committed, @Nullable DataSnapshot currentData) {
+                                                            if (committed) {
+                                                                userLikesRef.setValue(true);
+                                                                Toast.makeText(getActivity(), "Ai apreciat evenimentul", Toast.LENGTH_SHORT).show();
+                                                            } else {
+                                                                Toast.makeText(getActivity(), "Eroare la aprecierea evenimentului", Toast.LENGTH_SHORT).show();
+                                                            }
+                                                        }
+                                                    });
+                                                }
+                                            }
+
+                                            @Override
+                                            public void onCancelled(@NonNull DatabaseError error) {
+                                                Toast.makeText(getActivity(), "Eroare la verificarea aprecierii evenimentului", Toast.LENGTH_SHORT).show();
+                                            }
+                                        });
                                     }
 
                                     @Override
                                     public void onAddCarToEvent(Event event) {
 
+                                    }
+
+                                    @Override
+                                    public void onModifyEvent(Event event) {
+                                        Intent intent = new Intent(getActivity(), ModifyEvent.class);
+                                        intent.putExtra("name", event.getName());
+                                        startActivity(intent);
                                     }
 
                                 });

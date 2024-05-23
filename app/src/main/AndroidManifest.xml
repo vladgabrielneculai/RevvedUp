@@ -23,6 +23,9 @@
         android:theme="@style/Theme.RevvedUp"
         tools:targetApi="s">
         <activity
+            android:name=".ModifyEvent"
+            android:exported="false" />
+        <activity
             android:name=".RegisterCarInEvent"
             android:exported="false" />
         <activity

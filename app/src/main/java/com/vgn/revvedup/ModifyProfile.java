@@ -57,7 +57,7 @@ public class ModifyProfile extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.modify_profile);
+        setContentView(R.layout.activity_modify_profile);
 
         backButton = findViewById(R.id.backtomore);
         modifyButton = findViewById(R.id.savechanges);

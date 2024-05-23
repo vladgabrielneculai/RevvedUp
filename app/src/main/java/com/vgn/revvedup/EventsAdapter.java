@@ -33,6 +33,8 @@ public class EventsAdapter extends RecyclerView.Adapter<EventsAdapter.UserViewHo
         void onLikeEvent(Event event);
 
         void onAddCarToEvent(Event event);
+
+        void onModifyEvent(Event event);
     }
 
     public void setOnItemClickListener(OnItemClickListener listener) {
@@ -69,6 +71,10 @@ public class EventsAdapter extends RecyclerView.Adapter<EventsAdapter.UserViewHo
                 .placeholder(R.drawable.empty_image) // Placeholder image while loading
                 .error(R.drawable.error_image) // Error image if loading fails
                 .into(holder.eventImageView); // ImageView to display the image
+
+        // Set the number of likes
+        holder.likes.setText(String.valueOf(event.getNoLikes()));
+        holder.cars.setText(String.valueOf(event.getNoCars()));
     }
 
     @Override
@@ -78,20 +84,22 @@ public class EventsAdapter extends RecyclerView.Adapter<EventsAdapter.UserViewHo
 
     public class UserViewHolder extends RecyclerView.ViewHolder {
 
-        private final TextView eventTextView;
-        private final TextView eventDateTextView;
+        private final TextView eventTextView, eventDateTextView, likes, cars;
         private final ImageView eventImageView;
-        private final Button viewDetails, deleteEvent, likeEvent, addCarToEvent;
+        private final Button viewDetails, deleteEvent, likeEvent, addCarToEvent, modifyEvent;
 
         public UserViewHolder(@NonNull View itemView) {
             super(itemView);
             eventTextView = itemView.findViewById(R.id.eventTextView);
             eventDateTextView = itemView.findViewById(R.id.eventDateTextView);
             eventImageView = itemView.findViewById(R.id.img);
+            likes = itemView.findViewById(R.id.likes);
+            cars = itemView.findViewById(R.id.cars);
             viewDetails = itemView.findViewById(R.id.viewDetails);
             deleteEvent = itemView.findViewById(R.id.deleteEvent);
             likeEvent = itemView.findViewById(R.id.likeEvent);
             addCarToEvent = itemView.findViewById(R.id.addCarToEvent);
+            modifyEvent = itemView.findViewById(R.id.modifyEvent);
 
             if (viewDetails != null) {
                 viewDetails.setOnClickListener(v -> {
@@ -123,6 +131,15 @@ public class EventsAdapter extends RecyclerView.Adapter<EventsAdapter.UserViewHo
 
             if (addCarToEvent != null) {
                 addCarToEvent.setOnClickListener(v -> {
+                    int position = getAdapterPosition();
+                    if (position != RecyclerView.NO_POSITION && itemClickListener != null) {
+                        itemClickListener.onAddCarToEvent(events.get(position));
+                    }
+                });
+            }
+
+            if (modifyEvent != null) {
+                modifyEvent.setOnClickListener(v -> {
                     int position = getAdapterPosition();
                     if (position != RecyclerView.NO_POSITION && itemClickListener != null) {
                         itemClickListener.onAddCarToEvent(events.get(position));
