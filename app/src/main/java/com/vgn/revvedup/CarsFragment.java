@@ -367,6 +367,48 @@ public class CarsFragment extends Fragment {
         });
     }
 
+    private void fetchCarWaitingListForEvent(String eventName) {
+        DatabaseReference eventRef = database.getReference("events").child(eventName).child("waitingList");
+
+        eventRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                for (DataSnapshot carSnapshot : snapshot.getChildren()) {
+                    String carModel = carSnapshot.getKey();
+                    String carRegistration = carSnapshot.getValue(String.class);
+                    if (carRegistration != null) {
+                        // Retrieve the car details from the database
+                        DatabaseReference carsRef = database.getReference("cars").child(carRegistration);
+                        carsRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(@NonNull DataSnapshot carSnapshot) {
+                                Car car = carSnapshot.getValue(Car.class);
+                                if (car != null) {
+                                    // Check if the current user is the owner of the car
+                                    if (car.getCarOwner().equals(user.getEmail())) {
+                                        // Add the car to the list
+                                        cars.add(car);
+                                        adapter.notifyDataSetChanged();
+                                    }
+                                }
+                            }
+
+                            @Override
+                            public void onCancelled(@NonNull DatabaseError error) {
+                                Log.w("CarsFragment", "Failed to fetch car details:", error.toException());
+                            }
+                        });
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                Log.w("CarsFragment", "Failed to fetch waiting list for event " + eventName + ":", error.toException());
+            }
+        });
+    }
+
     private void fetchCarWaitingList() {
         DatabaseReference eventsRef = database.getReference("events");
         String currentUserEmail = user.getEmail();
@@ -387,26 +429,6 @@ public class CarsFragment extends Fragment {
         });
     }
 
-    private void fetchCarWaitingListForEvent(String eventName) {
-        DatabaseReference eventRef = database.getReference("events").child(eventName).child("waitingList");
-
-        eventRef.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                for (DataSnapshot carSnapshot : snapshot.getChildren()) {
-                    String carModel = carSnapshot.getKey();
-                    String carOwner = carSnapshot.getValue(String.class);
-
-                    // Now you have carModel and carOwner, you can use them as needed
-                }
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-                Log.w("CarsFragment", "Failed to fetch waiting list for event " + eventName + ":", error.toException());
-            }
-        });
-    }
 
 
 //    private void fetchCarWaitingList(String searchTerm) {

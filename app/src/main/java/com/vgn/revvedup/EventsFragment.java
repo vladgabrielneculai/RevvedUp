@@ -223,7 +223,7 @@ public class EventsFragment extends Fragment {
                                     String roleFromDb = userSnapshot.child("role").getValue(String.class);
                                     switch (Objects.requireNonNull(roleFromDb)) {
                                         case "Participant":
-                                            fetchRecommenedEvents(newText);
+                                            fetchRecommendedEvents(newText);
                                             break;
                                         case "Admin":
                                             fetchEvents(newText);
@@ -275,7 +275,7 @@ public class EventsFragment extends Fragment {
         });
     }
 
-    private void fetchRecommenedEvents(String searchTerm) {
+    private void fetchRecommendedEvents(String searchTerm) {
         DatabaseReference eventsRef = database.getReference("events");
 
         eventsRef.addValueEventListener(new ValueEventListener() {
