@@ -1,5 +1,6 @@
 package com.vgn.revvedup;
 
+import android.app.AlertDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
@@ -53,8 +54,6 @@ public class CarsFragment extends Fragment {
         RecyclerView carRecyclerView = view.findViewById(R.id.carRecyclerView);
         SearchView searchView = view.findViewById(R.id.searchView);
         carRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-        adapter = new CarsAdapter(cars);
-        carRecyclerView.setAdapter(adapter);
 
         if (user != null) {
             String userEmail = user.getEmail();
@@ -66,16 +65,114 @@ public class CarsFragment extends Fragment {
                     if (snapshot.exists()) {
                         for (DataSnapshot userSnapshot : snapshot.getChildren()) {
                             String roleFromDb = userSnapshot.child("role").getValue(String.class);
+                            if (roleFromDb != null) {
+                                adapter = new CarsAdapter(cars, roleFromDb);
+                                carRecyclerView.setAdapter(adapter);
+                            }
 
                             switch (Objects.requireNonNull(roleFromDb)) {
                                 case "Participant":
                                     fetchUserCars(userEmail);
                                     break;
                                 case "Admin":
-                                case "Organizator":
                                     fetchCars();
                                     break;
+                                case "Organizator":
+                                    fetchCarWaitingList();
+                                    break;
                             }
+
+                            adapter.setOnItemClickListener(new CarsAdapter.OnItemClickListener() {
+                                @Override
+                                public void onDetailsClick(Car car) {
+                                    // Deschideți EventDetailsActivity și trimiteți detalii despre eveniment
+                                    Intent intent = new Intent(getActivity(), CarDetails.class);
+                                    intent.putExtra("carRegistration", car.getCarRegistration());
+                                    startActivity(intent);
+                                }
+
+                                @Override
+                                public void onDeleteClick(Car car) {
+                                    DatabaseReference carsRef = database.getReference("cars");
+                                    String carRegistration = car.getCarRegistration(); // presupunând că fiecare mașină are un cheie unic în baza de date
+
+                                    // Șterge mașina din baza de date
+                                    carsRef.child(carRegistration).removeValue().addOnSuccessListener(aVoid -> {
+                                        // Ștergere reușită
+                                        Toast.makeText(getActivity(), "Mașina a fost ștearsă cu succes", Toast.LENGTH_SHORT).show();
+                                    }).addOnFailureListener(e -> {
+                                        // Întâmpinare erori în timpul ștergerii
+                                        Toast.makeText(getActivity(), "Eroare la ștergerea mașinii: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                                    });
+                                }
+
+                                @Override
+                                public void onAcceptClick(Car car) {
+                                    // Fetch events from the database of the current user
+                                    DatabaseReference eventsRef = database.getReference("events");
+                                    String currentUserEmail = user.getEmail();
+
+                                    eventsRef.orderByChild("eventOwner").equalTo(currentUserEmail).addListenerForSingleValueEvent(new ValueEventListener() {
+                                        @Override
+                                        public void onDataChange(@NonNull DataSnapshot snapshot) {
+                                            List<String> eventNames = new ArrayList<>();
+                                            for (DataSnapshot eventSnapshot : snapshot.getChildren()) {
+                                                String eventName = eventSnapshot.getKey();
+                                                eventNames.add(eventName);
+                                            }
+
+                                            // Show a dialog to select the event
+                                            AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+                                            builder.setTitle("Selecteaza Eveniment");
+
+                                            String[] events = eventNames.toArray(new String[0]);
+
+                                            builder.setItems(events, (dialog, which) -> {
+                                                String selectedEventName = events[which];
+                                                acceptCarForEvent(car, selectedEventName);
+                                            });
+
+                                            builder.show();
+                                        }
+
+                                        @Override
+                                        public void onCancelled(@NonNull DatabaseError error) {
+                                            Log.w("CarsFragment", "Failed to fetch events for current user:", error.toException());
+                                        }
+                                    });
+                                }
+
+
+                                @Override
+                                public void onDenyCar(Car car) {
+                                    // Fetch events from the database of the current user
+                                    DatabaseReference eventsRef = database.getReference("events");
+                                    String currentUserEmail = user.getEmail();
+
+                                    eventsRef.orderByChild("eventOwner").equalTo(currentUserEmail).addListenerForSingleValueEvent(new ValueEventListener() {
+                                        @Override
+                                        public void onDataChange(@NonNull DataSnapshot snapshot) {
+                                            for (DataSnapshot eventSnapshot : snapshot.getChildren()) {
+                                                String eventName = eventSnapshot.getKey();
+                                                denyCarForEvent(car, eventName);
+                                            }
+                                        }
+
+                                        @Override
+                                        public void onCancelled(@NonNull DatabaseError error) {
+                                            Log.w("CarsFragment", "Failed to fetch events for current user:", error.toException());
+                                        }
+                                    });
+
+                                }
+
+                                @Override
+                                public void onModifyClick(Car car) {
+                                    Intent intent = new Intent(getActivity(), ModifyCar.class);
+                                    intent.putExtra("name", car.getCarRegistration());
+                                    startActivity(intent);
+                                }
+                            });
                         }
                     }
                 }
@@ -106,6 +203,11 @@ public class CarsFragment extends Fragment {
                                 for (DataSnapshot userSnapshot : snapshot.getChildren()) {
                                     String roleFromDb = userSnapshot.child("role").getValue(String.class);
 
+                                    if (roleFromDb != null) {
+                                        adapter = new CarsAdapter(cars, roleFromDb);
+                                        carRecyclerView.setAdapter(adapter);
+                                    }
+
                                     switch (Objects.requireNonNull(roleFromDb)) {
                                         case "Participant":
                                             fetchUserCars(userEmail, newText);
@@ -129,32 +231,46 @@ public class CarsFragment extends Fragment {
             }
         });
 
-        adapter.setOnItemClickListener(new CarsAdapter.OnItemClickListener() {
-            @Override
-            public void onDetailsClick(Car car) {
-                // Deschideți EventDetailsActivity și trimiteți detalii despre eveniment
-                Intent intent = new Intent(getActivity(), CarDetails.class);
-                intent.putExtra("carRegistration", car.getCarRegistration());
-                startActivity(intent);
-            }
-
-            @Override
-            public void onDeleteClick(Car car) {
-                DatabaseReference carsRef = database.getReference("cars");
-                String carRegistration = car.getCarRegistration(); // presupunând că fiecare mașină are un cheie unic în baza de date
-
-                // Șterge mașina din baza de date
-                carsRef.child(carRegistration).removeValue().addOnSuccessListener(aVoid -> {
-                    // Ștergere reușită
-                    Toast.makeText(getActivity(), "Mașina a fost ștearsă cu succes", Toast.LENGTH_SHORT).show();
-                }).addOnFailureListener(e -> {
-                    // Întâmpinare erori în timpul ștergerii
-                    Toast.makeText(getActivity(), "Eroare la ștergerea mașinii: " + e.getMessage(), Toast.LENGTH_SHORT).show();
-                });
-            }
-        });
 
         return view;
+    }
+
+    private void acceptCarForEvent(Car car, String selectedEventName) {
+        DatabaseReference eventRef = database.getReference("events").child(selectedEventName);
+
+        // Remove the car from the waiting list
+        eventRef.child("waitingList").child(car.getCarRegistration()).removeValue().addOnSuccessListener(aVoid -> {
+            // If removal is successful, add the car to the accepted list
+            eventRef.child("acceptedList").child(car.getCarModel()).setValue(car.getCarRegistration()).addOnSuccessListener(aVoid1 -> {
+                // Notify the user
+                Toast.makeText(getActivity(), "Car accepted successfully", Toast.LENGTH_SHORT).show();
+            }).addOnFailureListener(e -> {
+                // Notify the user if there's an error
+                Toast.makeText(getActivity(), "Error accepting car: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+            });
+        }).addOnFailureListener(e -> {
+            // Notify the user if there's an error
+            Toast.makeText(getActivity(), "Error removing car from waiting list: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+        });
+    }
+
+    private void denyCarForEvent(Car car, String eventName) {
+        DatabaseReference eventRef = database.getReference("events").child(eventName);
+
+        // Remove the car from the waiting list
+        eventRef.child("waitingList").child(car.getCarModel()).removeValue().addOnSuccessListener(aVoid -> {
+            // If removal is successful, add the car to the denied list
+            eventRef.child("deniedList").child(car.getCarModel()).setValue(car.getCarOwner()).addOnSuccessListener(aVoid1 -> {
+                // Notify the user
+                Toast.makeText(getActivity(), "Car denied successfully for event: " + eventName, Toast.LENGTH_SHORT).show();
+            }).addOnFailureListener(e -> {
+                // Notify the user if there's an error
+                Toast.makeText(getActivity(), "Error denying car for event " + eventName + ": " + e.getMessage(), Toast.LENGTH_SHORT).show();
+            });
+        }).addOnFailureListener(e -> {
+            // Notify the user if there's an error
+            Toast.makeText(getActivity(), "Error removing car from waiting list for event " + eventName + ": " + e.getMessage(), Toast.LENGTH_SHORT).show();
+        });
     }
 
     private void fetchCars() {
@@ -250,5 +366,52 @@ public class CarsFragment extends Fragment {
             }
         });
     }
+
+    private void fetchCarWaitingList() {
+        DatabaseReference eventsRef = database.getReference("events");
+        String currentUserEmail = user.getEmail();
+
+        eventsRef.orderByChild("eventOwner").equalTo(currentUserEmail).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                for (DataSnapshot eventSnapshot : snapshot.getChildren()) {
+                    String eventName = eventSnapshot.getKey();
+                    fetchCarWaitingListForEvent(eventName);
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                Log.w("CarsFragment", "Failed to fetch events for current user:", error.toException());
+            }
+        });
+    }
+
+    private void fetchCarWaitingListForEvent(String eventName) {
+        DatabaseReference eventRef = database.getReference("events").child(eventName).child("waitingList");
+
+        eventRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                for (DataSnapshot carSnapshot : snapshot.getChildren()) {
+                    String carModel = carSnapshot.getKey();
+                    String carOwner = carSnapshot.getValue(String.class);
+
+                    // Now you have carModel and carOwner, you can use them as needed
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                Log.w("CarsFragment", "Failed to fetch waiting list for event " + eventName + ":", error.toException());
+            }
+        });
+    }
+
+
+//    private void fetchCarWaitingList(String searchTerm) {
+//
+//    }
+
 }
 

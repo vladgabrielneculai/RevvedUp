@@ -65,12 +65,14 @@ public class EventsAdapter extends RecyclerView.Adapter<EventsAdapter.UserViewHo
         Event event = events.get(position);
         holder.eventTextView.setText(event.getName());
         holder.eventDateTextView.setText(String.format("%s - %s", event.getStartDate(), event.getEndDate()));
+        holder.eventLocation.setText(event.getLocation());
 
         // Load and display the image using Glide
         Glide.with(holder.itemView.getContext()).load(event.getEventImage()) // Load image URL
                 .placeholder(R.drawable.empty_image) // Placeholder image while loading
                 .error(R.drawable.error_image) // Error image if loading fails
                 .into(holder.eventImageView); // ImageView to display the image
+
 
         // Set the number of likes
         holder.likes.setText(String.valueOf(event.getNoLikes()));
@@ -84,7 +86,7 @@ public class EventsAdapter extends RecyclerView.Adapter<EventsAdapter.UserViewHo
 
     public class UserViewHolder extends RecyclerView.ViewHolder {
 
-        private final TextView eventTextView, eventDateTextView, likes, cars;
+        private final TextView eventTextView, eventDateTextView, likes, cars, eventLocation;
         private final ImageView eventImageView;
         private final Button viewDetails, deleteEvent, likeEvent, addCarToEvent, modifyEvent;
 
@@ -93,6 +95,7 @@ public class EventsAdapter extends RecyclerView.Adapter<EventsAdapter.UserViewHo
             eventTextView = itemView.findViewById(R.id.eventTextView);
             eventDateTextView = itemView.findViewById(R.id.eventDateTextView);
             eventImageView = itemView.findViewById(R.id.img);
+            eventLocation = itemView.findViewById(R.id.eventLocationTextView);
             likes = itemView.findViewById(R.id.likes);
             cars = itemView.findViewById(R.id.cars);
             viewDetails = itemView.findViewById(R.id.viewDetails);
@@ -142,7 +145,7 @@ public class EventsAdapter extends RecyclerView.Adapter<EventsAdapter.UserViewHo
                 modifyEvent.setOnClickListener(v -> {
                     int position = getAdapterPosition();
                     if (position != RecyclerView.NO_POSITION && itemClickListener != null) {
-                        itemClickListener.onAddCarToEvent(events.get(position));
+                        itemClickListener.onModifyEvent(events.get(position));
                     }
                 });
             }

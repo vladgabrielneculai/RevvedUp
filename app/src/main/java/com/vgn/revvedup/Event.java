@@ -9,28 +9,31 @@ public class Event {
     private int noLikes, noCars;
     private List<String> modsAllowed, eventCompetitions;
     private HashMap<String, Boolean> userLikes;
+    private List<String> participantsWaitingList, participantsAcceptedList, participantsRejectedList;
 
 
     private double latitude, longitude;
 
-    public Event(String name, String details, String startDate, String endDate, String location, double latitude, double longitude, String eventType, String eventImage, String eventOwner, List<String> modsAllowed, List<String> eventCompetitions, int noLikes, HashMap<String, Boolean> userLikes, int noCars) {
+    public Event(String name, String details, String startDate, String endDate, String location, String eventImage, String eventOwner, String eventType, int noLikes, int noCars, List<String> modsAllowed, List<String> eventCompetitions, HashMap<String, Boolean> userLikes, List<String> participantsWaitingList, List<String> participantsAcceptedList, List<String> participantsRejectedList, double latitude, double longitude) {
         this.name = name;
         this.details = details;
         this.startDate = startDate;
         this.endDate = endDate;
         this.location = location;
-        this.latitude = latitude;
-        this.longitude = longitude;
-        this.eventType = eventType;
         this.eventImage = eventImage;
         this.eventOwner = eventOwner;
+        this.eventType = eventType;
+        this.noLikes = noLikes;
+        this.noCars = noCars;
         this.modsAllowed = modsAllowed;
         this.eventCompetitions = eventCompetitions;
-        this.noLikes = noLikes;
         this.userLikes = userLikes;
-        this.noCars = noCars;
+        this.participantsWaitingList = participantsWaitingList;
+        this.participantsAcceptedList = participantsAcceptedList;
+        this.participantsRejectedList = participantsRejectedList;
+        this.latitude = latitude;
+        this.longitude = longitude;
     }
-
 
     public Event() {
     }
@@ -153,5 +156,29 @@ public class Event {
 
     public void setLongitude(double longitude) {
         this.longitude = longitude;
+    }
+
+    public List<String> getParticipantsWaitingList() {
+        return participantsWaitingList;
+    }
+
+    public void setParticipantsWaitingList(List<String> participantsWaitingList) {
+        this.participantsWaitingList = participantsWaitingList;
+    }
+
+    public List<String> getParticipantsAcceptedList() {
+        return participantsAcceptedList;
+    }
+
+    public void setParticipantsAcceptedList(List<String> participantsAcceptedList) {
+        this.participantsAcceptedList = participantsAcceptedList;
+    }
+
+    public List<String> getParticipantsRejectedList() {
+        return participantsRejectedList;
+    }
+
+    public void setParticipantsRejectedList(List<String> participantsRejectedList) {
+        this.participantsRejectedList = participantsRejectedList;
     }
 }

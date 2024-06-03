@@ -1,5 +1,6 @@
 package com.vgn.revvedup;
 
+import android.app.AlertDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
@@ -76,6 +77,7 @@ public class EventsFragment extends Fragment {
                                 // Switch pe rolul utilizatorului pentru a afișa evenimentele corespunzătoare
                                 switch (roleFromDb) {
                                     case "Participant":
+                                        fetchRecommendedEvents();
                                     case "Admin":
                                         fetchEvents();
                                         break;
@@ -174,7 +176,10 @@ public class EventsFragment extends Fragment {
 
                                     @Override
                                     public void onAddCarToEvent(Event event) {
-
+                                        if (user != null) {
+                                            String userEmail = user.getEmail();
+                                            fetchUserCars(userEmail, cars -> showCarSelectionDialog(cars, event));
+                                        }
                                     }
 
                                     @Override
@@ -217,8 +222,10 @@ public class EventsFragment extends Fragment {
                                 for (DataSnapshot userSnapshot : snapshot.getChildren()) {
                                     String roleFromDb = userSnapshot.child("role").getValue(String.class);
                                     switch (Objects.requireNonNull(roleFromDb)) {
-                                        case "Admin":
                                         case "Participant":
+                                            fetchRecommenedEvents(newText);
+                                            break;
+                                        case "Admin":
                                             fetchEvents(newText);
                                             break;
                                         case "Organizator":
@@ -241,6 +248,55 @@ public class EventsFragment extends Fragment {
         });
 
         return view;
+    }
+
+    private void fetchRecommendedEvents() {
+        //TODO: Implement the logic to fetch recommended events from the database
+        DatabaseReference eventsRef = database.getReference("events");
+
+        eventsRef.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                events.clear();
+                for (DataSnapshot childSnapshot : snapshot.getChildren()) {
+                    Event event = childSnapshot.getValue(Event.class);
+                    if (event != null) {
+                        events.add(event);
+                    }
+                }
+
+                adapter.notifyDataSetChanged();
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                Log.w("EventFragment", "Failed to fetch events:", error.toException());
+            }
+        });
+    }
+
+    private void fetchRecommenedEvents(String searchTerm) {
+        DatabaseReference eventsRef = database.getReference("events");
+
+        eventsRef.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                events.clear();
+                for (DataSnapshot childSnapshot : snapshot.getChildren()) {
+                    Event event = childSnapshot.getValue(Event.class);
+                    if (event != null && event.getName().toLowerCase().contains(searchTerm.toLowerCase())) {
+                        events.add(event);
+                    }
+                }
+
+                adapter.notifyDataSetChanged();
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                Log.w("EventFragment", "Failed to fetch events:", error.toException());
+            }
+        });
     }
 
     private void fetchEvents() {
@@ -335,6 +391,55 @@ public class EventsFragment extends Fragment {
                 Log.w("CarsFragment", "Failed to fetch user cars:", error.toException());
             }
         });
+    }
+
+    private void fetchUserCars(String userEmail, final CarsCallback callback) {
+        DatabaseReference carsRef = database.getReference("cars");
+
+        carsRef.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                List<Car> userCars = new ArrayList<>();
+                for (DataSnapshot carSnapshot : snapshot.getChildren()) {
+                    Car car = carSnapshot.getValue(Car.class);
+                    if (car != null && car.getCarOwner().equals(userEmail)) {
+                        userCars.add(car);
+                    }
+                }
+                callback.onCallback(userCars);
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                Log.w("EventsFragment", "Failed to fetch user cars:", error.toException());
+            }
+        });
+    }
+
+    public interface CarsCallback {
+        void onCallback(List<Car> cars);
+    }
+
+    private void showCarSelectionDialog(List<Car> cars, Event event) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+        builder.setTitle("Selectează un autovehicul");
+
+        String[] carNames = new String[cars.size()];
+        for (int i = 0; i < cars.size(); i++) {
+            carNames[i] = cars.get(i).getCarBrand() + " " + cars.get(i).getCarModel() + " - " + cars.get(i).getCarRegistration();
+        }
+
+        builder.setItems(carNames, (dialog, which) -> {
+            Car selectedCar = cars.get(which);
+            DatabaseReference eventRef = database.getReference("events").child(event.getName()).child("waitingList");
+            eventRef.child(selectedCar.getCarBrand() + " " + selectedCar.getCarModel()).setValue(selectedCar.getCarRegistration()).addOnSuccessListener(aVoid -> {
+                Toast.makeText(getActivity(), "V-ati înscris cu succes!", Toast.LENGTH_SHORT).show();
+            }).addOnFailureListener(e -> {
+                Toast.makeText(getActivity(), "O eroare s-a produs: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+            });
+        });
+
+        builder.show();
     }
 
 

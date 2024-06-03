@@ -114,4 +114,9 @@
     <string name="registered_cars">Mașini înscrise</string>
     <string name="no_likes">Număr aprecieri</string>
     <string name="no_accepted_cars">Number mașini acceptate</string>
+    <string name="accept">Acceptă</string>
+    <string name="deny">Refuză</string>
+    <string name="waiting">In asteptare</string>
+    <string name="accepted">Acceptati</string>
+    <string name="denied">Refuzati</string>
 </resources>

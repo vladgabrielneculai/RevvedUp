@@ -35,33 +35,43 @@
             android:textSize="30sp"
             android:textStyle="bold" />
 
-        <EditText
-            android:id="@+id/email"
+        <com.google.android.material.textfield.TextInputLayout
             android:layout_width="match_parent"
-            android:layout_height="50dp"
-            android:layout_marginTop="15sp"
-            android:autofillHints=""
-            android:background="@drawable/midnight_blue_border"
-            android:hint="@string/email"
-            android:inputType="textWebEmailAddress"
-            android:paddingStart="20dp"
-            android:paddingEnd="20dp"
-            android:textColor="@color/midnight_blue"
-            android:textSize="15sp" />
+            android:layout_height="match_parent"
+            android:layout_marginVertical="10dp"
+            app:boxBackgroundMode="none"
+            app:hintEnabled="false">
 
-        <EditText
-            android:id="@+id/password"
+            <EditText
+                android:id="@+id/email"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:autofillHints=""
+                android:background="@drawable/midnight_blue_border"
+                android:hint="@string/email"
+                android:inputType="textWebEmailAddress"
+                android:textColor="@color/midnight_blue"
+                android:textSize="15sp" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
             android:layout_width="match_parent"
-            android:layout_height="50dp"
-            android:layout_marginTop="15dp"
-            android:autofillHints=""
-            android:background="@drawable/midnight_blue_border"
-            android:hint="@string/password"
-            android:inputType="textPassword"
-            android:paddingStart="20dp"
-            android:paddingEnd="20dp"
-            android:textColor="@color/midnight_blue"
-            android:textSize="15sp" />
+            android:layout_height="match_parent"
+            app:boxBackgroundMode="none"
+            app:hintEnabled="false"
+            app:passwordToggleEnabled="true">
+
+            <EditText
+                android:id="@+id/password"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:autofillHints=""
+                android:background="@drawable/midnight_blue_border"
+                android:hint="@string/password"
+                android:inputType="textPassword"
+                android:textColor="@color/midnight_blue"
+                android:textSize="15sp" />
+        </com.google.android.material.textfield.TextInputLayout>
 
         <Button
             android:id="@+id/login_button"

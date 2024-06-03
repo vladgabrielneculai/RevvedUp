@@ -290,6 +290,9 @@ public class AddEventActivity extends AppCompatActivity implements OnMapReadyCal
 
             int noLikes = 0;
             int noCars = 0;
+            List<String> participantsWaitingList = new ArrayList<>();
+            List<String> participantsAcceptedList = new ArrayList<>();
+            List<String> participantsRejectedList = new ArrayList<>();
             HashMap<String, Boolean> userLikes = new HashMap<>();
 
 
@@ -299,22 +302,16 @@ public class AddEventActivity extends AppCompatActivity implements OnMapReadyCal
                 StorageReference imageRef = storageRef.child("event_images/" + filename);
 
                 imageRef.putFile(selectedImageUri)
-                        .addOnSuccessListener(taskSnapshot -> {
-                            imageRef.getDownloadUrl().addOnSuccessListener(uri -> {
-                                String eventImage = uri.toString();
-                                Event event = new Event(name, details, startDate, endDate, location, latitude, longitude, eventType, eventImage, eventOwner, modsAllowed, eventCompetitions, noLikes, userLikes, noCars);
-                                eventsRef.child(name).setValue(event);
-                                finish();
-                            }).addOnFailureListener(exception -> {
-                                Toast.makeText(AddEventActivity.this, "S-a produs o eroare la încărcarea imaginii. Vă rugăm reîncercați!", Toast.LENGTH_SHORT).show();
-                            });
-                        })
-                        .addOnFailureListener(exception -> {
-                            Toast.makeText(AddEventActivity.this, "S-a produs o eroare la încărcarea imaginii. Vă rugăm reîncercați!", Toast.LENGTH_SHORT).show();
-                        });
+                        .addOnSuccessListener(taskSnapshot -> imageRef.getDownloadUrl().addOnSuccessListener(uri -> {
+                            String eventImage = uri.toString();
+                            Event event = new Event(name, details, startDate, endDate, location, eventImage, eventOwner, eventType, noLikes, noCars, modsAllowed, eventCompetitions, userLikes, participantsWaitingList, participantsAcceptedList, participantsRejectedList, latitude, longitude);
+                            eventsRef.child(name).setValue(event);
+                            finish();
+                        }).addOnFailureListener(exception -> Toast.makeText(AddEventActivity.this, "S-a produs o eroare la încărcarea imaginii. Vă rugăm reîncercați!", Toast.LENGTH_SHORT).show()))
+                        .addOnFailureListener(exception -> Toast.makeText(AddEventActivity.this, "S-a produs o eroare la încărcarea imaginii. Vă rugăm reîncercați!", Toast.LENGTH_SHORT).show());
             } else {
                 String eventImage = "";
-                Event event = new Event(name, details, startDate, endDate, location, latitude, longitude, eventType, eventImage, eventOwner, modsAllowed, eventCompetitions, noLikes, userLikes, noCars);
+                Event event = new Event(name, details, startDate, endDate, location, eventImage, eventOwner, eventType, noLikes, noCars, modsAllowed, eventCompetitions, userLikes, participantsWaitingList, participantsAcceptedList, participantsRejectedList, latitude, longitude);
                 eventsRef.child(name).setValue(event);
                 finish();
             }

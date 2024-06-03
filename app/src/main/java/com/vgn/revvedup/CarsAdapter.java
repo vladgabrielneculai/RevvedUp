@@ -19,15 +19,23 @@ public class CarsAdapter extends RecyclerView.Adapter<CarsAdapter.UserViewHolder
 
     private static List<Car> cars = null;
     private static OnItemClickListener itemClickListener;
+    private static String userRole;
 
-    public CarsAdapter(List<Car> cars) {
+    public CarsAdapter(List<Car> cars, String userRole) {
         CarsAdapter.cars = cars;
+        CarsAdapter.userRole = userRole;
     }
 
     public interface OnItemClickListener {
         void onDetailsClick(Car car);
 
         void onDeleteClick(Car car);
+
+        void onAcceptClick(Car car);
+
+        void onDenyCar(Car car);
+
+        void onModifyClick(Car car);
     }
 
     public void setOnItemClickListener(OnItemClickListener listener) {
@@ -37,7 +45,19 @@ public class CarsAdapter extends RecyclerView.Adapter<CarsAdapter.UserViewHolder
     @NonNull
     @Override
     public CarsAdapter.UserViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.recycler_item_car_admin, parent, false);
+        View view = null;
+        switch (userRole) {
+            case "Admin":
+                view = LayoutInflater.from(parent.getContext()).inflate(R.layout.recycler_item_car_admin, parent, false);
+                break;
+            case "Organizator":
+                view = LayoutInflater.from(parent.getContext()).inflate(R.layout.recycler_item_car_event_admin, parent, false);
+                break;
+            case "Participant":
+                view = LayoutInflater.from(parent.getContext()).inflate(R.layout.recycler_item_car_participant, parent, false);
+                break;
+
+        }
         return new UserViewHolder(view);
     }
 
@@ -79,7 +99,7 @@ public class CarsAdapter extends RecyclerView.Adapter<CarsAdapter.UserViewHolder
         private final TextView carBrandTextView;
         private final TextView carModelTextView;
         private final ImageView carImageView;
-        private final Button viewDetails, deleteCar;
+        private final Button viewDetails, deleteCar, acceptCar, denyCar, modifyCar;
 
 
         public UserViewHolder(@NonNull View itemView) {
@@ -90,22 +110,54 @@ public class CarsAdapter extends RecyclerView.Adapter<CarsAdapter.UserViewHolder
             carImageView = itemView.findViewById(R.id.img);
             viewDetails = itemView.findViewById(R.id.viewDetails);
             deleteCar = itemView.findViewById(R.id.deleteCar);
+            acceptCar = itemView.findViewById(R.id.acceptCar);
+            denyCar = itemView.findViewById(R.id.denyCar);
+            modifyCar = itemView.findViewById(R.id.modifyCar);
 
-            viewDetails.setOnClickListener(v -> {
-                int position = getAdapterPosition();
-                if (position != RecyclerView.NO_POSITION && itemClickListener != null) {
-                    itemClickListener.onDetailsClick(cars.get(position));
-                }
-            });
+            if (viewDetails != null) {
+                viewDetails.setOnClickListener(v -> {
+                    int position = getAdapterPosition();
+                    if (position != RecyclerView.NO_POSITION && itemClickListener != null) {
+                        itemClickListener.onDetailsClick(cars.get(position));
+                    }
+                });
+            }
 
-            deleteCar.setOnClickListener(v -> {
-                int position = getAdapterPosition();
-                if (position != RecyclerView.NO_POSITION && itemClickListener != null) {
-                    itemClickListener.onDeleteClick(cars.get(position));
-                }
-            });
+            if (deleteCar != null) {
+                deleteCar.setOnClickListener(v -> {
+                    int position = getAdapterPosition();
+                    if (position != RecyclerView.NO_POSITION && itemClickListener != null) {
+                        itemClickListener.onDeleteClick(cars.get(position));
+                    }
+                });
+            }
 
+            if (acceptCar != null) {
+                acceptCar.setOnClickListener(v -> {
+                    int position = getAdapterPosition();
+                    if (position != RecyclerView.NO_POSITION && itemClickListener != null) {
+                        itemClickListener.onAcceptClick(cars.get(position));
+                    }
+                });
+            }
 
+            if (denyCar != null) {
+                denyCar.setOnClickListener(v -> {
+                    int position = getAdapterPosition();
+                    if (position != RecyclerView.NO_POSITION && itemClickListener != null) {
+                        itemClickListener.onDenyCar(cars.get(position));
+                    }
+                });
+            }
+
+            if (modifyCar != null) {
+                modifyCar.setOnClickListener(v -> {
+                    int position = getAdapterPosition();
+                    if (position != RecyclerView.NO_POSITION && itemClickListener != null) {
+                        itemClickListener.onModifyClick(cars.get(position));
+                    }
+                });
+            }
         }
     }
 }
