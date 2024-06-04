@@ -11,6 +11,7 @@ import android.widget.SearchView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -21,6 +22,8 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.MutableData;
+import com.google.firebase.database.Transaction;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
@@ -229,9 +232,37 @@ public class CarsFragment extends Fragment {
             if (task.isSuccessful()) {
                 // After adding, remove it from the waiting list
                 removeCarFromWaitingList(car, selectedEventName);
+
+                // Increment the noCars counter
+                incrementCarCounter(selectedEventName);
+
                 Toast.makeText(getActivity(), "Car accepted successfully", Toast.LENGTH_SHORT).show();
             } else {
                 Toast.makeText(getActivity(), "Error accepting car: " + task.getException().getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    private void incrementCarCounter(String eventName) {
+        DatabaseReference eventRef = database.getReference("events").child(eventName).child("noCars");
+        eventRef.runTransaction(new Transaction.Handler() {
+            @NonNull
+            @Override
+            public Transaction.Result doTransaction(@NonNull MutableData mutableData) {
+                Integer currentValue = mutableData.getValue(Integer.class);
+                if (currentValue == null) {
+                    mutableData.setValue(1);
+                } else {
+                    mutableData.setValue(currentValue + 1);
+                }
+                return Transaction.success(mutableData);
+            }
+
+            @Override
+            public void onComplete(@Nullable DatabaseError databaseError, boolean committed, @Nullable DataSnapshot dataSnapshot) {
+                if (databaseError != null) {
+                    Log.e("CarsFragment", "Error incrementing car counter: " + databaseError.getMessage());
+                }
             }
         });
     }
