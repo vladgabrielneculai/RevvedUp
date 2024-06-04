@@ -68,13 +68,10 @@ public class EventsFragment extends Fragment {
                     if (snapshot.exists()) {
                         for (DataSnapshot userSnapshot : snapshot.getChildren()) {
                             String roleFromDb = userSnapshot.child("role").getValue(String.class);
-                            // Verificare pentru a preveni NullPointerException
                             if (roleFromDb != null) {
-                                // Inițializare adapter și setare RecyclerView
                                 adapter = new EventsAdapter(events, roleFromDb);
                                 eventRecyclerView.setAdapter(adapter);
 
-                                // Switch pe rolul utilizatorului pentru a afișa evenimentele corespunzătoare
                                 switch (roleFromDb) {
                                     case "Participant":
                                         fetchRecommendedEvents();
