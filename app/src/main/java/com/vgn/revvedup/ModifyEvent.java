@@ -34,16 +34,18 @@ import com.google.firebase.storage.StorageReference;
 
 public class ModifyEvent extends AppCompatActivity implements OnMapReadyCallback {
 
-    private FirebaseAuth mAuth;
-    private FirebaseUser user;
+    FirebaseAuth mAuth;
+    FirebaseUser user;
 
-    private Button backButton, modifyButton, selectEventImage;
-    private ImageView eventImageView;
-    private EditText eventName, eventDetails;
-    private CheckBox exhaust, coilovers, bodykit, rims, performance_mods, loudest_pipe, limbo, best_car;
-    private Uri selectedImageUri;
-    private GoogleMap googleMap;
-    private boolean isEditMode = false;
+    Button backButton, modifyButton, selectEventImage;
+    ImageView eventImageView;
+    EditText eventName, eventDetails;
+    CheckBox exhaust, coilovers, bodykit, rims, performance_mods, loudest_pipe, limbo, best_car;
+    Uri selectedImageUri;
+    GoogleMap googleMap;
+    boolean isEditMode = false;
+
+    String event_name;
 
     private final ActivityResultLauncher<String> imagePickerLauncher = registerForActivityResult(
             new ActivityResultContracts.GetContent(),
@@ -64,7 +66,23 @@ public class ModifyEvent extends AppCompatActivity implements OnMapReadyCallback
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_modify_event);
 
-        initializeViews();
+        event_name = getIntent().getStringExtra("name");
+
+        backButton = findViewById(R.id.back);
+        modifyButton = findViewById(R.id.addEvent);
+        selectEventImage = findViewById(R.id.change_image);
+        eventImageView = findViewById(R.id.eventImageView);
+        eventName = findViewById(R.id.eventName);
+        eventDetails = findViewById(R.id.eventDetails);
+        exhaust = findViewById(R.id.exhaust);
+        coilovers = findViewById(R.id.coilovers);
+        bodykit = findViewById(R.id.bodykit);
+        rims = findViewById(R.id.rims);
+        performance_mods = findViewById(R.id.performance_mods);
+        loudest_pipe = findViewById(R.id.loudest_pipe);
+        limbo = findViewById(R.id.limbo);
+        best_car = findViewById(R.id.best_car);
+
         disableEditText();
 
         // Initialize the SupportMapFragment and request the map
@@ -78,7 +96,7 @@ public class ModifyEvent extends AppCompatActivity implements OnMapReadyCallback
         mAuth = FirebaseAuth.getInstance();
         user = mAuth.getCurrentUser();
         if (user != null) {
-            populateEventData();
+            populateEventData(event_name);
         }
 
         selectEventImage.setOnClickListener(v -> imagePickerLauncher.launch("image/*"));
@@ -100,27 +118,8 @@ public class ModifyEvent extends AppCompatActivity implements OnMapReadyCallback
         backButton.setOnClickListener(v -> finish());
     }
 
-    private void initializeViews() {
-        backButton = findViewById(R.id.back);
-        modifyButton = findViewById(R.id.addEvent);
-        selectEventImage = findViewById(R.id.change_image);
-        eventImageView = findViewById(R.id.eventImageView);
-        eventName = findViewById(R.id.eventName);
-        eventDetails = findViewById(R.id.eventDetails);
-        exhaust = findViewById(R.id.exhaust);
-        coilovers = findViewById(R.id.coilovers);
-        bodykit = findViewById(R.id.bodykit);
-        rims = findViewById(R.id.rims);
-        performance_mods = findViewById(R.id.performance_mods);
-        loudest_pipe = findViewById(R.id.loudest_pipe);
-        limbo = findViewById(R.id.limbo);
-        best_car = findViewById(R.id.best_car);
-
-        mAuth = FirebaseAuth.getInstance();
-    }
-
-    private void populateEventData() {
-        DatabaseReference eventRef = FirebaseDatabase.getInstance().getReference("events").child("Cars & Planes 2024");
+    private void populateEventData(String event_name) {
+        DatabaseReference eventRef = FirebaseDatabase.getInstance().getReference("events").child(event_name);
         eventRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
@@ -187,20 +186,20 @@ public class ModifyEvent extends AppCompatActivity implements OnMapReadyCallback
         googleMap.getUiSettings().setZoomControlsEnabled(true);
 
         // Since googleMap is ready, you can add the marker and move the camera
-        populateEventData(); // Make sure this method is only called once and modify it accordingly.
+        populateEventData(event_name); // Make sure this method is only called once and modify it accordingly.
     }
 
     private void updateDataInDatabase(FirebaseUser user) {
         String newName = eventName.getText().toString();
         String newDetails = eventDetails.getText().toString();
 
-        DatabaseReference eventRef = FirebaseDatabase.getInstance().getReference("events").child("Cars & Planes 2024");
+        DatabaseReference eventRef = FirebaseDatabase.getInstance().getReference("events").child(event_name);
         eventRef.child("name").setValue(newName);
         eventRef.child("details").setValue(newDetails);
 
         if (selectedImageUri != null) {
             StorageReference storageReference = FirebaseStorage.getInstance().getReference();
-            StorageReference eventImageRef = storageReference.child("event_images/Cars & Planes 2024/");
+            StorageReference eventImageRef = storageReference.child("event_images").child(event_name);
             eventImageRef.putFile(selectedImageUri)
                     .addOnSuccessListener(taskSnapshot -> eventImageRef.getDownloadUrl().addOnCompleteListener(task -> {
                         if (task.isSuccessful()) {
