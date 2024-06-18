@@ -72,16 +72,15 @@ public class HomeFragment extends Fragment {
 
         switch (role) {
             case "Admin":
-                // Încarcă conținut specific pentru admin în FragmentContainerView
-                fragment = new AdminHomeFragment(); // presupunând că există un AdminFragment definit
+                fragment = new AdminHomeFragment();
                 break;
             case "Organizator":
-                // Încarcă conținut specific pentru event admin în FragmentContainerView
-                fragment = new EventAdminHomeFragment(); // presupunând că există un EventAdminFragment definit
+
+                fragment = new EventAdminHomeFragment();
                 break;
             case "Participant":
-                // Încarcă conținut specific pentru participant în FragmentContainerView
-                fragment = new ParticipantHomeFragment(); // presupunând că există un ParticipantFragment definit
+
+                fragment = new ParticipantHomeFragment();
                 break;
         }
 
