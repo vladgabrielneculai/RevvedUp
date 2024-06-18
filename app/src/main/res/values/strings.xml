@@ -119,4 +119,10 @@
     <string name="waiting">In asteptare</string>
     <string name="accepted">Acceptati</string>
     <string name="denied">Refuzati</string>
+    <string name="accepted_cars">Masini Acceptate</string>
+    <string name="denied_cars">Masini Respinse</string>
+    <string name="closeby_events">Evenimente in Apropiere</string>
+    <string name="accepted_denied_cars">Masini acceptate/refuzate</string>
+    <string name="mods_type">Tipuri de modificari</string>
+    <string name="event_description">Descriere</string>
 </resources>

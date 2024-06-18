@@ -294,6 +294,7 @@ public class AddEventActivity extends AppCompatActivity implements OnMapReadyCal
             List<String> participantsAcceptedList = new ArrayList<>();
             List<String> participantsRejectedList = new ArrayList<>();
             HashMap<String, Boolean> userLikes = new HashMap<>();
+            double score = 0.0d;
 
 
             if (selectedImageUri != null) {
@@ -304,14 +305,14 @@ public class AddEventActivity extends AppCompatActivity implements OnMapReadyCal
                 imageRef.putFile(selectedImageUri)
                         .addOnSuccessListener(taskSnapshot -> imageRef.getDownloadUrl().addOnSuccessListener(uri -> {
                             String eventImage = uri.toString();
-                            Event event = new Event(name, details, startDate, endDate, location, eventImage, eventOwner, eventType, noLikes, noCars, modsAllowed, eventCompetitions, userLikes, participantsWaitingList, participantsAcceptedList, participantsRejectedList, latitude, longitude);
+                            Event event = new Event(name, details, startDate, endDate, location, eventImage, eventOwner, eventType, noLikes, noCars, modsAllowed, eventCompetitions, userLikes, participantsWaitingList, participantsAcceptedList, participantsRejectedList, latitude, longitude, score);
                             eventsRef.child(name).setValue(event);
                             finish();
                         }).addOnFailureListener(exception -> Toast.makeText(AddEventActivity.this, "S-a produs o eroare la încărcarea imaginii. Vă rugăm reîncercați!", Toast.LENGTH_SHORT).show()))
                         .addOnFailureListener(exception -> Toast.makeText(AddEventActivity.this, "S-a produs o eroare la încărcarea imaginii. Vă rugăm reîncercați!", Toast.LENGTH_SHORT).show());
             } else {
                 String eventImage = "";
-                Event event = new Event(name, details, startDate, endDate, location, eventImage, eventOwner, eventType, noLikes, noCars, modsAllowed, eventCompetitions, userLikes, participantsWaitingList, participantsAcceptedList, participantsRejectedList, latitude, longitude);
+                Event event = new Event(name, details, startDate, endDate, location, eventImage, eventOwner, eventType, noLikes, noCars, modsAllowed, eventCompetitions, userLikes, participantsWaitingList, participantsAcceptedList, participantsRejectedList, latitude, longitude, score);
                 eventsRef.child(name).setValue(event);
                 finish();
             }

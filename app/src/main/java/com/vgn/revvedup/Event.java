@@ -10,11 +10,12 @@ public class Event {
     private List<String> modsAllowed, eventCompetitions;
     private HashMap<String, Boolean> userLikes;
     private List<String> participantsWaitingList, participantsAcceptedList, participantsRejectedList;
+    private Double score;
 
 
-    private double latitude, longitude;
+    private Double latitude, longitude;
 
-    public Event(String name, String details, String startDate, String endDate, String location, String eventImage, String eventOwner, String eventType, int noLikes, int noCars, List<String> modsAllowed, List<String> eventCompetitions, HashMap<String, Boolean> userLikes, List<String> participantsWaitingList, List<String> participantsAcceptedList, List<String> participantsRejectedList, double latitude, double longitude) {
+    public Event(String name, String details, String startDate, String endDate, String location, String eventImage, String eventOwner, String eventType, int noLikes, int noCars, List<String> modsAllowed, List<String> eventCompetitions, HashMap<String, Boolean> userLikes, List<String> participantsWaitingList, List<String> participantsAcceptedList, List<String> participantsRejectedList, Double latitude, Double longitude, Double score) {
         this.name = name;
         this.details = details;
         this.startDate = startDate;
@@ -33,6 +34,7 @@ public class Event {
         this.participantsRejectedList = participantsRejectedList;
         this.latitude = latitude;
         this.longitude = longitude;
+        this.score = score;
     }
 
     public Event() {
@@ -142,19 +144,19 @@ public class Event {
         this.eventType = eventType;
     }
 
-    public double getLatitude() {
+    public Double getLatitude() {
         return latitude;
     }
 
-    public void setLatitude(double latitude) {
+    public void setLatitude(Double latitude) {
         this.latitude = latitude;
     }
 
-    public double getLongitude() {
+    public Double getLongitude() {
         return longitude;
     }
 
-    public void setLongitude(double longitude) {
+    public void setLongitude(Double longitude) {
         this.longitude = longitude;
     }
 
@@ -181,4 +183,14 @@ public class Event {
     public void setParticipantsRejectedList(List<String> participantsRejectedList) {
         this.participantsRejectedList = participantsRejectedList;
     }
+
+    public Double getScore() {
+        return score;
+    }
+
+    public void setScore(Double score) {
+        this.score = score;
+    }
+
+
 }

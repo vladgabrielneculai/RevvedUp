@@ -34,14 +34,20 @@ public class EventsFragment extends Fragment {
 
     // TODO: If the user is "admin": display the events from the database
     // TODO: If the user is "organizator": display his events
-    // TODO: If the user is "participant": display the events based on the recommandation algorithm
+    // TODO: If the user is "participant": display the events based on the recommendation algorithm
 
     private FirebaseDatabase database;
     private FirebaseAuth mAuth;
     private FirebaseUser user;
     private List<Event> events;
+    private List<Car> userCars = new ArrayList<>();
 
     private EventsAdapter adapter;
+
+    private static final double LIKES_WEIGHT = 0.4;
+    private static final double CARS_WEIGHT = 0.3;
+    private static final double MODS_ALLOWED_WEIGHT = 0.2;
+    private static final double MODS_APPLIED_WEIGHT = 0.1;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -248,7 +254,6 @@ public class EventsFragment extends Fragment {
     }
 
     private void fetchRecommendedEvents() {
-        //TODO: Implement the logic to fetch recommended events from the database
         DatabaseReference eventsRef = database.getReference("events");
 
         eventsRef.addValueEventListener(new ValueEventListener() {
@@ -258,10 +263,13 @@ public class EventsFragment extends Fragment {
                 for (DataSnapshot childSnapshot : snapshot.getChildren()) {
                     Event event = childSnapshot.getValue(Event.class);
                     if (event != null) {
+                        double score = calculateEventScore(event);
+                        event.setScore(score);
                         events.add(event);
                     }
                 }
 
+                events.sort((e1, e2) -> Double.compare(e2.getScore(), e1.getScore()));
                 adapter.notifyDataSetChanged();
             }
 
@@ -271,6 +279,7 @@ public class EventsFragment extends Fragment {
             }
         });
     }
+
 
     private void fetchRecommendedEvents(String searchTerm) {
         DatabaseReference eventsRef = database.getReference("events");
@@ -282,10 +291,14 @@ public class EventsFragment extends Fragment {
                 for (DataSnapshot childSnapshot : snapshot.getChildren()) {
                     Event event = childSnapshot.getValue(Event.class);
                     if (event != null && event.getName().toLowerCase().contains(searchTerm.toLowerCase())) {
+                        double score = calculateEventScore(event);
+                        event.setScore(score);
                         events.add(event);
                     }
                 }
 
+                // Sort events by score
+                events.sort((e1, e2) -> Double.compare(e2.getScore(), e1.getScore()));
                 adapter.notifyDataSetChanged();
             }
 
@@ -295,6 +308,7 @@ public class EventsFragment extends Fragment {
             }
         });
     }
+
 
     private void fetchEvents() {
         DatabaseReference eventsRef = database.getReference("events");
@@ -439,5 +453,24 @@ public class EventsFragment extends Fragment {
         builder.show();
     }
 
+    private double calculateEventScore(Event event) {
+        int likes = event.getNoLikes();
+        int cars = event.getNoCars();
+        int modsAllowed = event.getModsAllowed().size();
+        int modsApplied = getUserCarModsApplied(event.getEventOwner());
+
+        return (likes * LIKES_WEIGHT) +
+                (cars * CARS_WEIGHT) +
+                (modsAllowed * MODS_ALLOWED_WEIGHT) +
+                (modsApplied * MODS_APPLIED_WEIGHT);
+    }
+
+    private int getUserCarModsApplied(String userEmail) {
+        int modsCount = 0;
+        for (Car car : userCars) {
+            modsCount += car.getModsApplied().size();
+        }
+        return modsCount;
+    }
 
 }
