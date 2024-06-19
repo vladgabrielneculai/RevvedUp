@@ -4,10 +4,10 @@ import android.Manifest;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -46,15 +46,22 @@ public class AdminHomeFragment extends Fragment implements OnMapReadyCallback, A
     private FusedLocationProviderClient fusedLocationClient;
 
     private static final int LOCATION_PERMISSION_REQUEST_CODE = 1;
-    private static final double RADIUS_IN_KM = 150.0;
+    private Location currentLocation;
+    private static final double EARTH_RADIUS_KM = 6371.0;
 
     private DatabaseReference databaseReference;
     private PieChart modsPieChart, accepteddeniedPieChart;
     private PieDataSet modsDataSet, accepteddeniedDataSet;
     private List<PieEntry> modsPC, accepteddeniedPC;
 
-    public AdminHomeFragment() {
+    // Liste pentru latitudini și longitudini
+    private List<Double> latitudes;
+    private List<Double> longitudes;
 
+    public AdminHomeFragment() {
+        // Inițializează listele
+        latitudes = new ArrayList<>();
+        longitudes = new ArrayList<>();
     }
 
     @Override
@@ -69,110 +76,108 @@ public class AdminHomeFragment extends Fragment implements OnMapReadyCallback, A
         modsDataSet = new PieDataSet(modsPC, "Modificări auto");
         accepteddeniedDataSet = new PieDataSet(accepteddeniedPC, "Acceptat/Refuzat");
 
-
         // Initialize Firebase Database
         FirebaseDatabase database = FirebaseDatabase.getInstance();
         databaseReference = database.getReference().child("cars");
 
         // Initialize Google Maps
         SupportMapFragment mapFragment = (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.location_map);
-        mapFragment.getMapAsync((OnMapReadyCallback) this);
-
-        // Initialize FusedLocationProviderClient
-        fusedLocationClient = LocationServices.getFusedLocationProviderClient(requireActivity());
-
+        mapFragment.getMapAsync(this);
 
         // Retrieve data for Mods PieChart
         retrieveModsData();
         retrieveAcceptedDeniedData();
 
+        // Map test
+        fusedLocationClient = LocationServices.getFusedLocationProviderClient(getActivity());
+        fetchLocation();
+
         return view;
+    }
+
+    private void fetchLocation() {
+        if (ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, LOCATION_PERMISSION_REQUEST_CODE);
+        } else {
+            fusedLocationClient.getLastLocation().addOnSuccessListener(location -> {
+                if (location != null) {
+                    currentLocation = location;
+                    SupportMapFragment mapFragment = (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.location_map);
+                    if (mapFragment != null) {
+                        mapFragment.getMapAsync(this);
+                    }
+                }
+            });
+        }
     }
 
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
 
-        // Request location permission
-        if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_FINE_LOCATION)
-                == PackageManager.PERMISSION_GRANTED) {
-            // Permission is granted, retrieve user's location
-            getUserLocation();
-        } else {
-            // Permission is not granted, request it
-            ActivityCompat.requestPermissions(requireActivity(),
-                    new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
-                    LOCATION_PERMISSION_REQUEST_CODE);
+        if (currentLocation != null) {
+            LatLng currentLatLng = new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude());
+            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(currentLatLng, 10));
+            googleMap.getUiSettings().setZoomControlsEnabled(true);
+            fetchEventsFromFirebase();
         }
     }
 
-    private void getUserLocation() {
-        if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_FINE_LOCATION)
-                == PackageManager.PERMISSION_GRANTED) {
-            fusedLocationClient.getLastLocation()
-                    .addOnSuccessListener(requireActivity(), location -> {
-                        if (location != null) {
-                            // User's location retrieved successfully
-                            double userLatitude = location.getLatitude();
-                            double userLongitude = location.getLongitude();
+    private void fetchEventsFromFirebase() {
+        DatabaseReference eventsRef = FirebaseDatabase.getInstance().getReference("events");
+        eventsRef.get().addOnCompleteListener(task -> {
+            if (task.isSuccessful()) {
+                DataSnapshot dataSnapshot = task.getResult();
+                List<LatLng> eventLocations = new ArrayList<>();
 
-                            // Query nearby events from the database
-                            queryNearbyEvents(userLatitude, userLongitude);
-                        }
-                    });
-        }
-    }
-
-    private void queryNearbyEvents(double userLatitude, double userLongitude) {
-        // Assuming databaseReference points to the root of your database
-        DatabaseReference eventsReference = databaseReference.child("events");
-        eventsReference.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 for (DataSnapshot eventSnapshot : dataSnapshot.getChildren()) {
-                    double eventLatitude = eventSnapshot.child("latitude").getValue(Double.class);
-                    double eventLongitude = eventSnapshot.child("longitude").getValue(Double.class);
+                    Double latitude = eventSnapshot.child("latitude").getValue(Double.class);
+                    Double longitude = eventSnapshot.child("longitude").getValue(Double.class);
 
-                    // Calculate the distance between user's location and event location
-                    float[] results = new float[1];
-                    Location.distanceBetween(userLatitude, userLongitude, eventLatitude, eventLongitude, results);
-                    float distanceInKm = results[0] / 1000;
+                    if (latitude != null && longitude != null) {
+                        latitudes.add(latitude);
+                        longitudes.add(longitude);
 
-                    if (distanceInKm <= RADIUS_IN_KM) {
-                        // Event is within the specified radius
-                        String eventName = eventSnapshot.child("name").getValue(String.class);
-                        String eventLocation = eventSnapshot.child("location").getValue(String.class);
-
-                        // Add a marker on the map for the nearby event
-                        LatLng eventLatLng = new LatLng(eventLatitude, eventLongitude);
-                        mMap.addMarker(new MarkerOptions()
-                                .position(eventLatLng)
-                                .title(eventName)
-                                .snippet(eventLocation));
+                        LatLng eventLatLng = new LatLng(latitude, longitude);
+                        if (isWithinRadius(currentLocation, eventLatLng, 300)) {
+                            eventLocations.add(eventLatLng);
+                            mMap.addMarker(new MarkerOptions().position(eventLatLng).title(eventSnapshot.getKey()));
+                        }
                     }
                 }
-
-                // Move the camera to the user's location
-                LatLng userLatLng = new LatLng(userLatitude, userLongitude);
-                mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(userLatLng, 8));
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-                // Handle errors if any
+                Log.d("AdminHomeFragment", "Latitudes: " + latitudes);
+                Log.d("AdminHomeFragment", "Longitudes: " + longitudes);
+            } else {
+                Log.e("AdminHomeFragment", "Error getting events data", task.getException());
             }
         });
     }
 
+    private boolean isWithinRadius(Location currentLocation, LatLng eventLatLng, int radiusKm) {
+        double lat1 = currentLocation.getLatitude();
+        double lon1 = currentLocation.getLongitude();
+        double lat2 = eventLatLng.latitude;
+        double lon2 = eventLatLng.longitude;
+
+        double latDistance = Math.toRadians(lat2 - lat1);
+        double lonDistance = Math.toRadians(lon2 - lon1);
+
+        double a = Math.sin(latDistance / 2) * Math.sin(latDistance / 2)
+                + Math.cos(Math.toRadians(lat1)) * Math.cos(Math.toRadians(lat2))
+                * Math.sin(lonDistance / 2) * Math.sin(lonDistance / 2);
+
+        double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+        double distance = EARTH_RADIUS_KM * c;
+
+        return distance <= radiusKm;
+    }
+
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         if (requestCode == LOCATION_PERMISSION_REQUEST_CODE) {
             if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                // Permission granted, retrieve user's location
-                getUserLocation();
-            } else {
-                // Permission denied, handle accordingly
-                Toast.makeText(requireContext(), "Location permission denied", Toast.LENGTH_SHORT).show();
+                fetchLocation();
             }
         }
     }
@@ -227,9 +232,8 @@ public class AdminHomeFragment extends Fragment implements OnMapReadyCallback, A
     }
 
     private void retrieveAcceptedDeniedData() {
-
+        // Implementation for accepted/denied data retrieval
     }
-
 
     private void updateModsPieChart() {
         // Set options for modsDataSet
@@ -244,10 +248,10 @@ public class AdminHomeFragment extends Fragment implements OnMapReadyCallback, A
         // Refresh Mods PieChart
         modsPieChart.invalidate();
 
-        //Get rid of the Description Label
+        // Get rid of the Description Label
         modsPieChart.getDescription().setEnabled(false);
 
-        //Set center text
+        // Set center text
         modsPieChart.setCenterText("Modificări auto");
         modsPieChart.setDrawEntryLabels(true);
         modsPieChart.setHoleRadius(50);
@@ -255,11 +259,10 @@ public class AdminHomeFragment extends Fragment implements OnMapReadyCallback, A
 
         Legend legend = modsPieChart.getLegend();
         legend.setEnabled(false);
-
     }
 
     private void updateAcceptedDeniedPieChart() {
-
+        // Implementation for updating the accepted/denied pie chart
     }
 
     @Override
