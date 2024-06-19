@@ -337,6 +337,9 @@ public class AddEventActivity extends AppCompatActivity implements OnMapReadyCal
     @Override
     public void onMapReady(@NotNull GoogleMap googleMap) {
         myMap = googleMap;
+
+        // Optional: Set up map settings here, e.g., enable user location, set map type, etc.
+        googleMap.getUiSettings().setZoomControlsEnabled(true);
     }
 
     private LatLng getLatLngFromAddress(String address) {
