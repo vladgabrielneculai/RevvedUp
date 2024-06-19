@@ -1,6 +1,7 @@
 package com.vgn.revvedup;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -10,7 +11,12 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.bumptech.glide.Glide;
+import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -18,15 +24,15 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.database.annotations.NotNull;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
-import java.util.List;
 import java.util.Objects;
 
-public class EventDetails extends AppCompatActivity {
+public class EventDetails extends AppCompatActivity implements OnMapReadyCallback {
 
-    //Database & Storage
+    // Database & Storage
     FirebaseDatabase database;
     FirebaseAuth mAuth;
     FirebaseUser user;
@@ -34,17 +40,21 @@ public class EventDetails extends AppCompatActivity {
     StorageReference storageRef;
     DatabaseReference eventsRef, usersRef, carsRef;
 
-    //XML Components
+    // XML Components
     Button backButton;
     TextView eventName, eventDetails, eventDate;
     ImageView eventImageView;
     GoogleMap myMap;
+    SupportMapFragment mapFragment;
 
-    //Lists and Adapters
-    List<String> modsAllowed, eventCompetitions;
+    // Event Location
+    private LatLng eventLocation;
+    private boolean mapReady = false;
+    private boolean dataReady = false;
+
+    private static final String TAG = "EventDetails";
 
     @Override
-
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
@@ -52,29 +62,35 @@ public class EventDetails extends AppCompatActivity {
 
         String event_name = getIntent().getStringExtra("name");
 
-        //Firebase instances
+        // Firebase instances
         database = FirebaseDatabase.getInstance();
         mAuth = FirebaseAuth.getInstance();
         storage = FirebaseStorage.getInstance();
         user = mAuth.getCurrentUser();
 
-        //Access to "events" database
+        // Access to "events" database
         eventsRef = database.getReference("events");
 
-        //Access to "users" database
+        // Access to "users" database
         usersRef = database.getReference("users");
 
-        //Access to "cars" database
+        // Access to "cars" database
         carsRef = database.getReference("cars");
 
-        //Access to storage
+        // Access to storage
         storageRef = storage.getReference();
 
-        //Declaration of XML Layout components
+        // Declaration of XML Layout components
         eventName = findViewById(R.id.eventName);
         eventDetails = findViewById(R.id.eventDetails);
         eventDate = findViewById(R.id.eventDate);
         eventImageView = findViewById(R.id.eventImageView);
+
+        mapFragment = (SupportMapFragment) getSupportFragmentManager()
+                .findFragmentById(R.id.location_map);
+        if (mapFragment != null) {
+            mapFragment.getMapAsync(this);
+        }
 
         backButton = findViewById(R.id.back);
 
@@ -89,6 +105,13 @@ public class EventDetails extends AppCompatActivity {
                             eventDate.setText(String.format("%s - %s", event.getStartDate(), event.getEndDate()));
                             eventName.setText(Objects.requireNonNull(event.getName()));
 
+                            // Get the coordinates of the location from the database
+                            double latitude = event.getLatitude();
+                            double longitude = event.getLongitude();
+                            eventLocation = new LatLng(latitude, longitude);
+                            dataReady = true;
+                            updateMap();
+
                             // Load and display the image using Glide
                             Glide.with(EventDetails.this)
                                     .load(event.getEventImage()) // Load image URL
@@ -101,19 +124,27 @@ public class EventDetails extends AppCompatActivity {
 
                 @Override
                 public void onCancelled(@NonNull DatabaseError error) {
-
+                    Log.e(TAG, "Database error: " + error.getMessage());
                 }
             });
         }
 
-
-        //Back button
+        // Back button
         backButton.setOnClickListener(v -> finish());
-
     }
 
-//    @Override
-//    public void onMapReady(@NotNull GoogleMap googleMap) {
-//        myMap = googleMap;
-//    }
+    @Override
+    public void onMapReady(@NotNull GoogleMap googleMap) {
+        myMap = googleMap;
+        googleMap.getUiSettings().setZoomControlsEnabled(true);
+        mapReady = true;
+        updateMap();
+    }
+
+    private void updateMap() {
+        if (mapReady && dataReady && eventLocation != null) {
+            myMap.addMarker(new MarkerOptions().position(eventLocation).title(eventName.getText().toString()));
+            myMap.moveCamera(CameraUpdateFactory.newLatLngZoom(eventLocation, 15));
+        }
+    }
 }
