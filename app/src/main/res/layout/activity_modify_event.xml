@@ -105,30 +105,6 @@
 
         </TableLayout>
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="15dp"
-            android:layout_marginTop="10dp"
-            android:layout_marginBottom="5dp"
-            android:text="@string/event_type"
-            android:textColor="@color/black"
-            android:textSize="16sp" />
-
-        <com.google.android.material.textfield.TextInputLayout
-            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.Dense.ExposedDropdownMenu"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginHorizontal="10dp">
-
-            <AutoCompleteTextView
-                android:id="@+id/autoComplete_eventtype"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:hint="@string/choose_event_type"
-                android:inputType="none" />
-
-        </com.google.android.material.textfield.TextInputLayout>
 
         <TextView
             android:layout_width="wrap_content"
