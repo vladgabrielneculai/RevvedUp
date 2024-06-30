@@ -37,7 +37,7 @@
         android:id="@+id/accepted_cars_list"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="10dp" />
+        android:layout_marginTop="16dp" />
 
     <TextView
         android:id="@+id/denied_cars_label"
@@ -53,6 +53,6 @@
         android:id="@+id/denied_cars_list"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="10dp" />
+        android:layout_marginTop="16dp" />
 
 </LinearLayout>

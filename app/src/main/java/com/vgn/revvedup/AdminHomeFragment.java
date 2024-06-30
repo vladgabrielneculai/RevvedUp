@@ -50,8 +50,8 @@ public class AdminHomeFragment extends Fragment implements OnMapReadyCallback, A
     private static final double EARTH_RADIUS_KM = 6371.0;
 
     private DatabaseReference databaseReference;
-    private PieChart modsPieChart, accepteddeniedPieChart;
-    private PieDataSet modsDataSet, accepteddeniedDataSet;
+    private PieChart modsPieChart;
+    private PieDataSet modsDataSet;
     private List<PieEntry> modsPC, accepteddeniedPC;
 
     // Liste pentru latitudini și longitudini
@@ -68,14 +68,12 @@ public class AdminHomeFragment extends Fragment implements OnMapReadyCallback, A
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_home_admin, container, false);
         modsPieChart = view.findViewById(R.id.pieChartMods);
-        accepteddeniedPieChart = view.findViewById(R.id.pieChartAcceptedDenied);
 
         modsPC = new ArrayList<>();
         accepteddeniedPC = new ArrayList<>();
 
         modsDataSet = new PieDataSet(modsPC, "Modificări auto");
-        accepteddeniedDataSet = new PieDataSet(accepteddeniedPC, "Acceptat/Refuzat");
-
+        
         // Initialize Firebase Database
         FirebaseDatabase database = FirebaseDatabase.getInstance();
         databaseReference = database.getReference().child("cars");
@@ -86,7 +84,6 @@ public class AdminHomeFragment extends Fragment implements OnMapReadyCallback, A
 
         // Retrieve data for Mods PieChart
         retrieveModsData();
-        retrieveAcceptedDeniedData();
 
         // Map test
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(getActivity());
@@ -231,38 +228,17 @@ public class AdminHomeFragment extends Fragment implements OnMapReadyCallback, A
         });
     }
 
-    private void retrieveAcceptedDeniedData() {
-        // Implementation for accepted/denied data retrieval
-    }
-
     private void updateModsPieChart() {
-        // Set options for modsDataSet
-        // For example, colors, text size, etc.
-
-        // Assemble data
         PieData modsData = new PieData(modsDataSet);
-
-        // Set data for Mods PieChart
         modsPieChart.setData(modsData);
-
-        // Refresh Mods PieChart
         modsPieChart.invalidate();
-
-        // Get rid of the Description Label
         modsPieChart.getDescription().setEnabled(false);
-
-        // Set center text
         modsPieChart.setCenterText("Modificări auto");
         modsPieChart.setDrawEntryLabels(true);
         modsPieChart.setHoleRadius(50);
         modsPieChart.setCenterTextSize(16);
-
         Legend legend = modsPieChart.getLegend();
         legend.setEnabled(false);
-    }
-
-    private void updateAcceptedDeniedPieChart() {
-        // Implementation for updating the accepted/denied pie chart
     }
 
     @Override
