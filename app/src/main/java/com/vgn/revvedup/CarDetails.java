@@ -32,7 +32,8 @@ public class CarDetails extends AppCompatActivity {
     FirebaseUser user;
     FirebaseStorage storage;
     StorageReference storageRef;
-    DatabaseReference eventsRef, usersRef, carsRef;
+    DatabaseReference usersRef;
+    DatabaseReference carsRef;
 
     //XML Components
     Button backButton;

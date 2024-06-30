@@ -1,5 +1,6 @@
 package com.vgn.revvedup;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -59,18 +60,28 @@ public class UsersFragment extends Fragment {
             }
         });
 
-        adapter.setOnItemClickListener(user -> {
-            DatabaseReference usersRef = database.getReference("users");
-            String username = user.getUsername(); // presupunând că fiecare mașină are un cheie unic în baza de date
+        adapter.setOnItemClickListener(new UsersAdapter.OnItemClickListener() {
+            @Override
+            public void onDeleteClick(User user) {
+                DatabaseReference usersRef = database.getReference("users");
+                String username = user.getUsername(); // presupunând că fiecare mașină are un cheie unic în baza de date
 
-            // Șterge mașina din baza de date
-            usersRef.child(username).removeValue().addOnSuccessListener(aVoid -> {
-                // Ștergere reușită
-                Toast.makeText(getActivity(), "Utilizatorul a fost șters cu succes", Toast.LENGTH_SHORT).show();
-            }).addOnFailureListener(e -> {
-                // Întâmpinare erori în timpul ștergerii
-                Toast.makeText(getActivity(), "Eroare la ștergerea utilizatorului: " + e.getMessage(), Toast.LENGTH_SHORT).show();
-            });
+                // Șterge mașina din baza de date
+                usersRef.child(username).removeValue().addOnSuccessListener(aVoid -> {
+                    // Ștergere reușită
+                    Toast.makeText(getActivity(), "Utilizatorul a fost șters cu succes", Toast.LENGTH_SHORT).show();
+                }).addOnFailureListener(e -> {
+                    // Întâmpinare erori în timpul ștergerii
+                    Toast.makeText(getActivity(), "Eroare la ștergerea utilizatorului: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                });
+            }
+
+            @Override
+            public void onViewDetailsUser(User user) {
+                Intent intent = new Intent(getActivity(), UserDetails.class);
+                intent.putExtra("username", user.getUsername());
+                startActivity(intent);
+            }
         });
 
         return view;

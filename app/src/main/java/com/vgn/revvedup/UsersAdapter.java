@@ -25,6 +25,8 @@ public class UsersAdapter extends RecyclerView.Adapter<UsersAdapter.UserViewHold
 
     public interface OnItemClickListener {
         void onDeleteClick(User user);
+
+        void onViewDetailsUser(User user);
     }
 
     public void setOnItemClickListener(OnItemClickListener listener) {
@@ -62,7 +64,7 @@ public class UsersAdapter extends RecyclerView.Adapter<UsersAdapter.UserViewHold
         private final TextView usernameTextView;
         private final TextView roleTextView;
         private final ImageView userImageView;
-        private final Button deleteUser;
+        private final Button deleteUser, viewDetailsUser;
 
         public UserViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -70,11 +72,19 @@ public class UsersAdapter extends RecyclerView.Adapter<UsersAdapter.UserViewHold
             roleTextView = itemView.findViewById(R.id.roleTextView);
             userImageView = itemView.findViewById(R.id.img);
             deleteUser = itemView.findViewById(R.id.deleteUser);
+            viewDetailsUser = itemView.findViewById(R.id.viewDetails);
 
             deleteUser.setOnClickListener(v -> {
                 int position = getAdapterPosition();
                 if (position != RecyclerView.NO_POSITION && itemClickListener != null) {
                     itemClickListener.onDeleteClick(users.get(position));
+                }
+            });
+
+            viewDetailsUser.setOnClickListener(v -> {
+                int position = getAdapterPosition();
+                if (position != RecyclerView.NO_POSITION && itemClickListener != null) {
+                    itemClickListener.onViewDetailsUser(users.get(position));
                 }
             });
         }

@@ -45,6 +45,8 @@
         <activity
             android:name=".ModifyProfile"
             android:exported="false" />
+        <activity android:name=".UserDetails"
+            android:exported="false" />
         <activity
             android:name=".LoadingScreenActivity"
             android:exported="true">
