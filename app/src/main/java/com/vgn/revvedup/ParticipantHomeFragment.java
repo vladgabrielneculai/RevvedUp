@@ -15,6 +15,12 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
+import com.github.mikephil.charting.charts.PieChart;
+import com.github.mikephil.charting.components.Legend;
+import com.github.mikephil.charting.data.PieData;
+import com.github.mikephil.charting.data.PieDataSet;
+import com.github.mikephil.charting.data.PieEntry;
+import com.github.mikephil.charting.utils.ColorTemplate;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -23,6 +29,8 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
@@ -34,17 +42,15 @@ public class ParticipantHomeFragment extends Fragment implements OnMapReadyCallb
 
     private GoogleMap mMap;
     private FusedLocationProviderClient fusedLocationClient;
-
     private static final int LOCATION_PERMISSION_REQUEST_CODE = 1;
     private Location currentLocation;
     private static final double EARTH_RADIUS_KM = 6371.0;
 
-    // Liste pentru latitudini și longitudini
     private List<Double> latitudes;
     private List<Double> longitudes;
+    private PieChart pieChart;
 
     public ParticipantHomeFragment() {
-        // Inițializează listele
         latitudes = new ArrayList<>();
         longitudes = new ArrayList<>();
     }
@@ -53,23 +59,23 @@ public class ParticipantHomeFragment extends Fragment implements OnMapReadyCallb
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_home_participant, container, false);
 
-        // Initialize Firebase Database
         FirebaseDatabase database = FirebaseDatabase.getInstance();
         DatabaseReference databaseReference = database.getReference().child("cars");
 
-        // Initialize Google Maps
         SupportMapFragment mapFragment = (SupportMapFragment) getChildFragmentManager().findFragmentById(R.id.location_map);
         mapFragment.getMapAsync(this);
 
-        // Map test
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(getActivity());
         fetchLocation();
+
+        pieChart = view.findViewById(R.id.pieChartAcceptedDenied);
+        updatePieChart();
 
         return view;
     }
 
     private void fetchLocation() {
-        if (ContextCompat.checkSelfPermission(getActivity(), android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+        if (ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, LOCATION_PERMISSION_REQUEST_CODE);
         } else {
             fusedLocationClient.getLastLocation().addOnSuccessListener(location -> {
@@ -87,6 +93,13 @@ public class ParticipantHomeFragment extends Fragment implements OnMapReadyCallb
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
+
+        if (ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+            mMap.setMyLocationEnabled(true);
+            mMap.getUiSettings().setMyLocationButtonEnabled(true);
+        } else {
+            ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, LOCATION_PERMISSION_REQUEST_CODE);
+        }
 
         if (currentLocation != null) {
             LatLng currentLatLng = new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude());
@@ -118,10 +131,10 @@ public class ParticipantHomeFragment extends Fragment implements OnMapReadyCallb
                         }
                     }
                 }
-                Log.d("AdminHomeFragment", "Latitudes: " + latitudes);
-                Log.d("AdminHomeFragment", "Longitudes: " + longitudes);
+                Log.d("ParticipantHomeFragment", "Latitudes: " + latitudes);
+                Log.d("ParticipantHomeFragment", "Longitudes: " + longitudes);
             } else {
-                Log.e("AdminHomeFragment", "Error getting events data", task.getException());
+                Log.e("ParticipantHomeFragment", "Error getting events data", task.getException());
             }
         });
     }
@@ -158,7 +171,72 @@ public class ParticipantHomeFragment extends Fragment implements OnMapReadyCallb
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+    }
 
-        // Here you can initialize any views or perform any additional setup for the fragment
+    private void updatePieChart() {
+        DatabaseReference eventsRef = FirebaseDatabase.getInstance().getReference("events");
+        eventsRef.get().addOnCompleteListener(task -> {
+            if (task.isSuccessful()) {
+                DataSnapshot dataSnapshot = task.getResult();
+                int acceptedCount = 0;
+                int deniedCount = 0;
+                String currentUserEmail = getCurrentUserEmail();
+
+                for (DataSnapshot eventSnapshot : dataSnapshot.getChildren()) {
+                    DataSnapshot acceptedList = eventSnapshot.child("acceptedList");
+                    DataSnapshot deniedList = eventSnapshot.child("deniedList");
+
+                    for (DataSnapshot carSnapshot : acceptedList.getChildren()) {
+                        String carOwner = carSnapshot.child("carOwner").getValue(String.class);
+                        if (currentUserEmail.equals(carOwner)) {
+                            acceptedCount++;
+                        }
+                    }
+
+                    for (DataSnapshot carSnapshot : deniedList.getChildren()) {
+                        String carOwner = carSnapshot.child("carOwner").getValue(String.class);
+                        if (currentUserEmail.equals(carOwner)) {
+                            deniedCount++;
+                        }
+                    }
+                }
+
+                List<PieEntry> entries = new ArrayList<>();
+                entries.add(new PieEntry(acceptedCount, "Acceptat"));
+                entries.add(new PieEntry(deniedCount, "Refuzat"));
+
+                PieDataSet dataSet = new PieDataSet(entries, "Status inscrieri");
+                // Set a different color for each entry
+                List<Integer> colors = new ArrayList<>();
+                for (int color : ColorTemplate.COLORFUL_COLORS) {
+                    colors.add(color);
+                }
+                dataSet.setColors(colors);
+                dataSet.setValueTextSize(18);
+                dataSet.setDrawValues(true);
+
+                PieData data = new PieData(dataSet);
+                pieChart.setData(data);
+                pieChart.invalidate(); // Refresh chart
+
+                // Customize legend
+                Legend legend = pieChart.getLegend();
+                legend.setEnabled(true);
+                legend.setTextSize(14f);
+                legend.setForm(Legend.LegendForm.CIRCLE);
+
+                pieChart.getDescription().setEnabled(false);
+                pieChart.setEntryLabelTextSize(12f);
+                pieChart.setEntryLabelColor(R.color.black);
+            }
+        });
+    }
+
+    private String getCurrentUserEmail() {
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        if (user != null) {
+            return user.getEmail();
+        }
+        return null;
     }
 }

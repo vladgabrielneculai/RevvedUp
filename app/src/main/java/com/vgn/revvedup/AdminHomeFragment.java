@@ -10,7 +10,6 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
@@ -40,7 +39,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class AdminHomeFragment extends Fragment implements OnMapReadyCallback, ActivityCompat.OnRequestPermissionsResultCallback{
+public class AdminHomeFragment extends Fragment implements OnMapReadyCallback, ActivityCompat.OnRequestPermissionsResultCallback {
 
     private GoogleMap mMap;
     private FusedLocationProviderClient fusedLocationClient;
@@ -73,7 +72,7 @@ public class AdminHomeFragment extends Fragment implements OnMapReadyCallback, A
         accepteddeniedPC = new ArrayList<>();
 
         modsDataSet = new PieDataSet(modsPC, "Modificări auto");
-        
+
         // Initialize Firebase Database
         FirebaseDatabase database = FirebaseDatabase.getInstance();
         databaseReference = database.getReference().child("cars");
@@ -111,6 +110,13 @@ public class AdminHomeFragment extends Fragment implements OnMapReadyCallback, A
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
+
+        if (ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+            mMap.setMyLocationEnabled(true);
+            mMap.getUiSettings().setMyLocationButtonEnabled(true);
+        } else {
+            ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, LOCATION_PERMISSION_REQUEST_CODE);
+        }
 
         if (currentLocation != null) {
             LatLng currentLatLng = new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude());
@@ -231,18 +237,16 @@ public class AdminHomeFragment extends Fragment implements OnMapReadyCallback, A
     private void updateModsPieChart() {
         PieData modsData = new PieData(modsDataSet);
         modsPieChart.setData(modsData);
-        modsPieChart.invalidate();
-        modsPieChart.getDescription().setEnabled(false);
-        modsPieChart.setCenterText("Modificări auto");
-        modsPieChart.setDrawEntryLabels(true);
-        modsPieChart.setHoleRadius(50);
-        modsPieChart.setCenterTextSize(16);
-        Legend legend = modsPieChart.getLegend();
-        legend.setEnabled(false);
-    }
+        modsPieChart.invalidate(); // Refresh chart
 
-    @Override
-    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
+        // Customize legend
+        Legend legend = modsPieChart.getLegend();
+        legend.setEnabled(true);
+        legend.setTextSize(14f);
+        legend.setForm(Legend.LegendForm.CIRCLE);
+
+        modsPieChart.getDescription().setEnabled(false);
+        modsPieChart.setEntryLabelTextSize(12f);
+        modsPieChart.setEntryLabelColor(R.color.black);
     }
 }

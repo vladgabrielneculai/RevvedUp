@@ -125,4 +125,5 @@
     <string name="accepted_denied_cars">Masini acceptate/refuzate</string>
     <string name="mods_type">Tipuri de modificari</string>
     <string name="event_description">Descriere</string>
+    <string name="accepted_refused">Acceptat/Refuzat</string>
 </resources>
