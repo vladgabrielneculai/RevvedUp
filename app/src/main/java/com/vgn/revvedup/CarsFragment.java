@@ -158,7 +158,7 @@ public class CarsFragment extends Fragment {
                                     @Override
                                     public void onModifyClick(Car car) {
                                         Intent intent = new Intent(getActivity(), ModifyCar.class);
-                                        intent.putExtra("name", car.getCarRegistration());
+                                        intent.putExtra("carRegistration", car.getCarRegistration());
                                         startActivity(intent);
                                     }
                                 });

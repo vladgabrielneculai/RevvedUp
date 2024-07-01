@@ -281,7 +281,7 @@
         </TableLayout>
 
         <Button
-            android:id="@+id/addCar"
+            android:id="@+id/modify_car"
             android:layout_width="match_parent"
             android:layout_height="60dp"
             android:layout_marginLeft="15dp"
